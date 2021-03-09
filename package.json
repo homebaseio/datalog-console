@@ -1,0 +1,16 @@
+{
+  "name": "datalog-console",
+  "version": "0.0.0",
+  "description": "Administration UI for Datalog databases.",
+  "main": "index.js",
+  "repository": "https://github.com/homebaseio/datalog-console.git",
+  "author": "Chris Smothers <chris@homebase.io>",
+  "license": "MIT",
+  "private": false,
+  "scripts": {
+    "dev": "shadow-cljs watch app"
+  },
+  "devDependencies": {
+    "shadow-cljs": "2.11.22"
+  }
+}
