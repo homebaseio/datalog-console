@@ -50,7 +50,7 @@ jobs:
         id: extract_branch
 
       - name: Publish to GitHub Pages 🚀
-        uses: JamesIves/github-pages-deploy-action@releases/v3
+        uses: JamesIves/github-pages-deploy-action@4.1.0
         with:
           branch: gh-pages
           folder: public
