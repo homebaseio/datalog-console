@@ -9,10 +9,16 @@
   "private": false,
   "scripts": {
     "dev": "shadow-cljs watch cards",
-    "dev:app": "shadow-cljs watch app"
+    "dev:app": "shadow-cljs watch app",
+    "build:tailwind": "postcss public/css/styles.css -o public/app/css/styles.css ; postcss public/css/styles.css -o public/cards/css/styles.css",
+    "build:tailwind:watch": "postcss public/css/styles.css -o public/app/css/styles.css -w & postcss public/css/styles.css -o public/cards/css/styles.css -w && kill $!"
   },
   "devDependencies": {
-    "shadow-cljs": "2.11.22"
+    "autoprefixer": "^10.2.5",
+    "postcss": "^8.2.8",
+    "postcss-cli": "^8.3.1",
+    "shadow-cljs": "2.11.22",
+    "tailwindcss": "^2.0.3"
   },
   "dependencies": {
     "highlight.js": "^9.12.0",
@@ -21,5 +27,11 @@
     "react-grid-layout": "^0.16.6",
     "react-icons": "^2.2.7",
     "reakit": "^0.11.1"
+  },
+  "postcss": {
+    "plugins": {
+      "tailwindcss": {},
+      "autoprefixer": {}
+    }
   }
 }

@@ -9,7 +9,7 @@
 
 (ws/defcard hello-card
   (ct.react/react-card
-   (element "div" {} "Hello World")))
+   (element "div" {:class ["font-black"]} "Hello World")))
 
 (ws/deftest sample-test
   (is (= 1 1)))

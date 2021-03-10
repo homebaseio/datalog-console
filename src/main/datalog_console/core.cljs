@@ -2,7 +2,7 @@
   (:require [reagent.dom :as rdom]))
 
 (defn root []
-  [:div "YOLO"])
+  [:div {:class ["font-black"]} "YOLO"])
 
 (defn mount! []
   (rdom/render [root] (js/document.getElementById "root")))
