@@ -15,7 +15,7 @@
     "build:tailwind": "NODE_ENV=production postcss public/css/styles.css -o public/app/css/styles.css ; NODE_ENV=production postcss public/css/styles.css -o public/cards/css/styles.css",
     "build:app": "shadow-cljs release app",
     "build:cards": "shadow-cljs release cards",
-    "build": "build:tailwind ; build:app ; build:cards"
+    "build": "yarn build:tailwind ; yarn build:app ; yarn build:cards"
   },
   "devDependencies": {
     "autoprefixer": "^10.2.5",
