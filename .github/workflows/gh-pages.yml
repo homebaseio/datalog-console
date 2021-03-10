@@ -62,7 +62,7 @@ jobs:
           SLACK_CHANNEL: proj-dev-datalog-console
           SLACK_COLOR: ${{ job.status }} # or a specific color like 'green' or '#ff00ff'
           SLACK_ICON: https://github.com/homebaseio.png?size=200
-          SLACK_MESSAGE: ":github: Branch: <https://github.com/homebaseio/datalog-console/tree/${{ steps.extract_branch.outputs.branch }}|${{ steps.extract_branch.outputs.branch }}>\n:crystal_ball: app: https://homebaseio.github.io/datalog-console/${{ steps.extract_branch.outputs.branch }}/app/index.html\n:8ball: cards: https://homebaseio.github.io/datalog-console/${{ steps.extract_branch.outputs.branch }}/cards/index.html"
+          SLACK_MESSAGE: "- :github: Branch: <https://github.com/homebaseio/datalog-console/tree/${{ steps.extract_branch.outputs.branch }}|${{ steps.extract_branch.outputs.branch }}>\n- :crystal_ball: app: https://homebaseio.github.io/datalog-console/${{ steps.extract_branch.outputs.branch }}/app/index.html\n- :card_file_box: cards: https://homebaseio.github.io/datalog-console/${{ steps.extract_branch.outputs.branch }}/cards/index.html"
           SLACK_TITLE: "Published ${{ steps.extract_branch.outputs.branch }} to GitHub Pages :rocket:"
           SLACK_USERNAME: Homebase
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
