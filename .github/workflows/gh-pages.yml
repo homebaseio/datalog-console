@@ -65,4 +65,4 @@ jobs:
           SLACK_MESSAGE: ":github: Branch: <https://github.com/homebaseio/datalog-console/tree/${{ steps.extract_branch.outputs.branch }}|${{ steps.extract_branch.outputs.branch }}>\n:crystal_ball: app: https://homebaseio.github.io/datalog-console/${{ steps.extract_branch.outputs.branch }}/app/index.html\n:8ball: cards: https://homebaseio.github.io/datalog-console/${{ steps.extract_branch.outputs.branch }}/cards/index.html"
           SLACK_TITLE: "Published ${{ steps.extract_branch.outputs.branch }} to GitHub Pages :rocket:"
           SLACK_USERNAME: Homebase
-          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
