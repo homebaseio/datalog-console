@@ -44,9 +44,14 @@ jobs:
 
       - run: yarn build
 
+      - name: Extract branch name
+        shell: bash
+        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+        id: extract_branch
+
       - name: Publish to GitHub Pages 🚀
         uses: JamesIves/github-pages-deploy-action@releases/v3
         with:
           branch: gh-pages
           folder: public
-          target-folder: ${GITHUB_REF##*/}
+          target-folder: ${{ steps.extract_branch.outputs.branch }}
