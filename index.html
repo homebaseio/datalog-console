@@ -6,7 +6,7 @@
         const response = await fetch('https://api.github.com/repos/homebaseio/datalog-console/git/trees/gh-pages');
         const data = await response.json();
         let htmlString = '<ul>';
-        for (let file of data.tree) {
+        for (let file of data.tree.filter(v => v.path !== 'index.html')) {
           htmlString += `<li><a href="${file.path}/app/index.html">${file.path} app</a></li>`;
           htmlString += `<li><a href="${file.path}/cards/index.html">${file.path} cards</a></li>`;
         }
