@@ -4,10 +4,21 @@
                 "src/test"]
  :dependencies [[reagent "1.0.0"]
                 [datascript "1.0.7"]
-                [binaryage/devtools "1.0.2"]]
- :dev-http {3000 "public"}
+                [binaryage/devtools "1.0.2"]
+                [nubank/workspaces "1.0.16"]]
  :builds {:app {:target :browser
-                :output-dir "public/js"
-                :asset-path "/js"
+                :output-dir "public/app/js"
+                :asset-path "/app/js"
                 :compiler-options {:infer-externs true}
-                :modules {:main {:init-fn datalog-console.core/init!}}}}}
+                :modules {:main {:init-fn datalog-console.core/init!}}
+                :devtools {:http-root "public/app"
+                           :http-port 3001
+                           :http-resource-root "."}}
+          :cards {:target nubank.workspaces.shadow-cljs.target
+                  :ns-regexp "-(test|cards)$"
+                  :output-dir "public/cards/js"
+                  :asset-path "/cards/js"
+                  :preloads [] ; optional, list namespaces to be pre loaded
+                  :devtools {:http-root "public/cards"
+                             :http-port 3000
+                             :http-resource-root "."}}}}

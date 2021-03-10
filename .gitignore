@@ -1,5 +1,6 @@
 node_modules/
-public/js
+public/app/js
+public/cards/js
 
 /target
 /checkouts

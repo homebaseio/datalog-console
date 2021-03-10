@@ -8,9 +8,18 @@
   "license": "MIT",
   "private": false,
   "scripts": {
-    "dev": "shadow-cljs watch app"
+    "dev": "shadow-cljs watch cards",
+    "dev:app": "shadow-cljs watch app"
   },
   "devDependencies": {
     "shadow-cljs": "2.11.22"
+  },
+  "dependencies": {
+    "highlight.js": "^9.12.0",
+    "react": "^17.0.1",
+    "react-dom": "17.0.1",
+    "react-grid-layout": "^0.16.6",
+    "react-icons": "^2.2.7",
+    "reakit": "^0.11.1"
   }
 }
