@@ -11,7 +11,7 @@
     "dev": "shadow-cljs watch cards",
     "dev:app": "shadow-cljs watch app",
     "build:tailwind:dev": "postcss public/css/styles.css -o public/app/css/styles.css ; postcss public/css/styles.css -o public/cards/css/styles.css",
-    "build:tailwind:watch": "postcss public/css/styles.css -o public/app/css/styles.css -w & postcss public/css/styles.css -o public/cards/css/styles.css -w && kill $!",
+    "build:tailwind:dev:watch": "postcss public/css/styles.css -o public/app/css/styles.css -w & postcss public/css/styles.css -o public/cards/css/styles.css -w && kill $!",
     "build:tailwind": "NODE_ENV=production postcss public/css/styles.css -o public/app/css/styles.css ; NODE_ENV=production postcss public/css/styles.css -o public/cards/css/styles.css",
     "build:app": "shadow-cljs release app",
     "build:cards": "shadow-cljs release cards",
@@ -25,6 +25,7 @@
     "tailwindcss": "^2.0.3"
   },
   "dependencies": {
+    "@tailwindcss/line-clamp": "^0.2.0",
     "highlight.js": "^9.12.0",
     "react": "^17.0.1",
     "react-dom": "17.0.1",

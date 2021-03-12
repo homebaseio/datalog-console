@@ -1,3 +1,6 @@
+const plugin = require('tailwindcss/plugin')
+
+// NOTE: run `yarn build:tailwind:dev` after editing this file
 module.exports = {
   purge: [
     './src/**/*.cljs',
@@ -9,5 +12,7 @@ module.exports = {
   variants: {
     extend: {},
   },
-  plugins: [],
+  plugins: [
+    require('@tailwindcss/line-clamp'),
+  ],
 }
