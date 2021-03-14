@@ -4,7 +4,8 @@
 
 (def conn
   (let [conn (d/create-conn
-              {:person/parents {:db/valueType :db.type/ref
+              {:name {:db/unique :db.unique/identity}
+               :person/parents {:db/valueType :db.type/ref
                                 :db/cardinality :db.cardinality/many}
                :person/friends {:db/valueType :db.type/ref
                                 :db/cardinality :db.cardinality/many}
@@ -16,6 +17,7 @@
                         :employer/person -2
                         :item/size 2
                         :item/age 3
+                        ;; :item/agelasdjflajsdlfkajsdlfjalsdjfalsdjflakjsdlfjklaksdjlfkj 3
                         :item/thingy 4}
                        {:db/id -2
                         :name "B"
@@ -40,7 +42,7 @@
 
 (declare 
  entity-tree-avs
- entity-tree)
+ entity-tree-table)
 
 (defn entity-tree-av [[a v] indent]
   (let [entity? (entity? (if (set? v) (first v) v))
@@ -50,7 +52,7 @@
        [:tr {:class "odd:bg-gray-100"}
         [:td {:title (str a)
               :style {:padding-left (str (+ 0.25 (* 1.5 indent)) "rem")}
-              :class "whitespace-nowrap"}
+              :class "pr-1 whitespace-nowrap"}
          (if entity?
            [:button {:class "pr-1 focus:outline-none"
                      :on-click #(reset! open? (not @open?))}
@@ -58,23 +60,27 @@
            [:span {:class "pr-1 invisible"} "▶"])
          (str a)]
         [:td {:title (str v)
-              :class "pl-2 line-clamp-1"}
+              :style {:max-width 0
+                      :min-width 100}
+              :class "pl-1 truncate w-full"}
          (if (and entity? (set? v))
            (str "[" (count v) " item" (when (< 1 (count v)) "s") "]")
-           (str (if entity? 
-                  (select-keys v [:db/id]) 
+           (str (if entity?
+                  (select-keys v [:db/id])
                   v)))]]
        (when @open?
          (if (set? v)
            (for [[i e] (map-indexed vector v)]
              ^{:key (str "refs" a i "-" (:db/id e) "-" indent)}
              [entity-tree-av [(str a " " i) e] (inc indent)])
-           [entity-tree v (inc indent)]))])))
+           [:tr {:class "border-b border-gray-100"}
+            [:td {:col-span 2 :class "p-0"}
+             [entity-tree-table v false (inc indent)]]]))])))
 
-(defn entity-tree-avs [avs indent]
+(defn entity-tree-avs [eid avs indent]
   [:<>
    (for [[a :as av] (sort avs)]
-     ^{:key (str a)} [entity-tree-av av indent])])
+     ^{:key (str eid "-" a)} [entity-tree-av av indent])])
 
 (defn make-keyword-reverse-ref [kw]
   (keyword (str (namespace kw) "/_" (name kw))))
@@ -95,22 +101,21 @@
                                                         [] rev-ref-eids-grouped-by-attr)]
     rev-ref-entities-grouped-by-attr))
 
-(defn entity-tree
-  ([entity] (entity-tree entity 0))
-  ([entity indent]
-    [:<>
-     [entity-tree-av [:db/id (:db/id entity)] indent]
-     [entity-tree-avs (seq entity) indent]
-     [entity-tree-avs (reverse-refs entity) indent]]))
+(defn entity-tree [entity indent]
+  [:<>
+   ^{:key (str (:db/id entity) "-" :db/id)} [entity-tree-av [:db/id (:db/id entity)] indent]
+   [entity-tree-avs (:db/id entity) (seq entity) indent]
+   [entity-tree-avs (:db/id entity) (reverse-refs entity) indent]])
 
-(defn entity-tree-table [entity]
-  [:table {:class "table-auto"}
-   [:thead
-    [:tr {:class "font-bold text-left"}
-     [:th {:class "pl-1"} "Attribute"]
-     [:th {:class "pl-2"} "Value"]]]
+(defn entity-tree-table [entity head? indent]
+  [:table {:class "table-auto w-full"}
+   (when head?
+     [:thead
+      [:tr {:class "font-bold text-left"}
+       [:th {:class "px-1"} "Attribute"]
+       [:th {:class "pl-1"} "Value"]]])
    [:tbody
-    [entity-tree entity]]])
+    [entity-tree entity indent]]])
 
 (defn entity []
   (let [lookup (r/atom "")
@@ -118,13 +123,14 @@
                 (d/entity @conn 1) ; TODO: replace with nil
                 )]
     (fn []
-      [:div {:class "w-full h-full"}
-       [:label [:p {:class "font-bold"} "Entity lookup"]
+      [:div {:class "w-full h-full overflow-auto pb-5"}
+       [:label {:class "block pt-1 pl-1"}
+        [:p {:class "font-bold"} "Entity lookup"]
         [:input {:type "text"
-                 :placholder "Entity id or lookup..."
+                 :placeholder "id or lookup ref..."
                  :class "border py-1 px-2 rounded"
                  :value @lookup
                  :on-change #(reset! lookup (.-value (.-target %)))
                  :on-key-down #(when (= "Enter" (.-key %))
                                  (reset! entity (d/entity @conn (cljs.reader/read-string @lookup))))}]]
-       [entity-tree-table @entity]])))
+       [entity-tree-table @entity true 0]])))

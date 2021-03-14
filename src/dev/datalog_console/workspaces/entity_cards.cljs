@@ -6,7 +6,8 @@
             [datalog-console.components.entity :as c.entity]))
 
 (ws/defcard entity-card
-  {::wsm/align {:flex 1}}
+  {::wsm/align {:flex 1}
+   ::wsm/node-props {:style {:overflow "hidden" :padding 0}}}
   (ct.react/react-card
    (reagent/as-element [c.entity/entity])))
 
