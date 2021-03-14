@@ -12,6 +12,8 @@
                                  :db/cardinality :db.cardinality/one}})]
     (d/transact! conn [{:db/id -1
                         :name "A"
+                        :description "I'm baby truffaut craft beer cold-pressed sartorial listicle aesthetic normcore edison bulb XOXO seitan celiac. Blog irony succulents synth shabby chic. Health goth hexagon semiotics wolf jean shorts narwhal, intelligentsia hell of hot chicken. La croix pour-over coloring book wayfarers austin, asymmetrical whatever messenger bag four dollar toast activated charcoal vice banjo vegan portland. Twee selfies chillwave normcore 3 wolf moon af coloring book flexitarian plaid poke mlkshk pitchfork bicycle rights. Franzen gluten-free lyft snackwave meditation man braid, tousled shabby chic banjo. Selfies tote bag chicharrones, hammock fam umami woke typewriter poutine fanny pack artisan copper mug."
+                        :employer/person -2
                         :item/size 2
                         :item/age 3
                         :item/thingy 4}
@@ -36,19 +38,43 @@
     (not (nil? (:db/id v)))
     (catch js/Error e false)))
 
-(defn entity-tree-av [[a v]]
-  (let [entity? (entity? (if (set? v) (first v) v))]
-    [:div {:class "flex w-full odd:bg-gray-100"}
-     [:span
-      {:title (str a)
-       :class "w-1/2 pl-2 line-clamp-1"}
-      (str a)]
-     [:span
-      {:title (str v)
-       :class "w-1/2 pl-4 line-clamp-1"}
-      (if (and entity? (set? v))
-        (str "[" (count v) " item" (when (< 1 (count v)) "s") "]")
-        (str v))]]))
+(declare 
+ entity-tree-avs
+ entity-tree)
+
+(defn entity-tree-av [[a v] indent]
+  (let [entity? (entity? (if (set? v) (first v) v))
+        open? (r/atom false)]
+    (fn []
+      [:<>
+       [:tr {:class "odd:bg-gray-100"}
+        [:td {:title (str a)
+              :style {:padding-left (str (+ 0.25 (* 1.5 indent)) "rem")}
+              :class "whitespace-nowrap"}
+         (if entity?
+           [:button {:class "pr-1 focus:outline-none"
+                     :on-click #(reset! open? (not @open?))}
+            (if @open? "▼" "▶")]
+           [:span {:class "pr-1 invisible"} "▶"])
+         (str a)]
+        [:td {:title (str v)
+              :class "pl-2 line-clamp-1"}
+         (if (and entity? (set? v))
+           (str "[" (count v) " item" (when (< 1 (count v)) "s") "]")
+           (str (if entity? 
+                  (select-keys v [:db/id]) 
+                  v)))]]
+       (when @open?
+         (if (set? v)
+           (for [[i e] (map-indexed vector v)]
+             ^{:key (str "refs" a i "-" (:db/id e) "-" indent)}
+             [entity-tree-av [(str a " " i) e] (inc indent)])
+           [entity-tree v (inc indent)]))])))
+
+(defn entity-tree-avs [avs indent]
+  [:<>
+   (for [[a :as av] (sort avs)]
+     ^{:key (str a)} [entity-tree-av av indent])])
 
 (defn make-keyword-reverse-ref [kw]
   (keyword (str (namespace kw) "/_" (name kw))))
@@ -69,20 +95,28 @@
                                                         [] rev-ref-eids-grouped-by-attr)]
     rev-ref-entities-grouped-by-attr))
 
-(defn entity-tree [entity]
-  [:div {:class "mt-4"}
-   [:div
-    [:div {:class "flex justify w-full font-bold"}
-     [:span {:class "w-1/2 pl-2"} "Attribute"]
-     [:span {:class "w-1/2 pl-4"} "Value"]]
-    [entity-tree-av [:db/id (:db/id entity)]]
-    (for [[a :as av] (into
-                      (vec entity)
-                      (reverse-refs entity))]
-      ^{:key (str a)} [entity-tree-av av])]])
+(defn entity-tree
+  ([entity] (entity-tree entity 0))
+  ([entity indent]
+    [:<>
+     [entity-tree-av [:db/id (:db/id entity)] indent]
+     [entity-tree-avs (seq entity) indent]
+     [entity-tree-avs (reverse-refs entity) indent]]))
+
+(defn entity-tree-table [entity]
+  [:table {:class "table-auto"}
+   [:thead
+    [:tr {:class "font-bold text-left"}
+     [:th {:class "pl-1"} "Attribute"]
+     [:th {:class "pl-2"} "Value"]]]
+   [:tbody
+    [entity-tree entity]]])
 
 (defn entity []
   (let [lookup (r/atom "")
+        entity (r/atom 
+                (d/entity @conn 1) ; TODO: replace with nil
+                )]
     (fn []
       [:div {:class "w-full h-full"}
        [:label [:p {:class "font-bold"} "Entity lookup"]
@@ -93,4 +127,4 @@
                  :on-change #(reset! lookup (.-value (.-target %)))
                  :on-key-down #(when (= "Enter" (.-key %))
                                  (reset! entity (d/entity @conn (cljs.reader/read-string @lookup))))}]]
-       [entity-tree @entity]])))
+       [entity-tree-table @entity]])))
