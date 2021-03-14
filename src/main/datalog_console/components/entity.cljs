@@ -17,7 +17,7 @@
                         :employer/person -2
                         :item/size 2
                         :item/age 3
-                        ;; :item/agelasdjflajsdlfkajsdlfjalsdjfalsdjflakjsdlfjklaksdjlfkj 3
+                        :item/with-a-very-very-very-long-name 3
                         :item/thingy 4}
                        {:db/id -2
                         :name "B"
@@ -51,8 +51,9 @@
       [:<>
        [:tr {:class "odd:bg-gray-100"}
         [:td {:title (str a)
-              :style {:padding-left (str (+ 0.25 (* 1.5 indent)) "rem")}
-              :class "pr-1 whitespace-nowrap"}
+              :style {:padding-left (str (+ 0.25 (* 1.5 indent)) "rem")
+                      :max-width "16rem"}
+              :class "pr-1 truncate"}
          (if entity?
            [:button {:class "pr-1 focus:outline-none"
                      :on-click #(reset! open? (not @open?))}
@@ -73,8 +74,11 @@
            (for [[i e] (map-indexed vector v)]
              ^{:key (str "refs" a i "-" (:db/id e) "-" indent)}
              [entity-tree-av [(str a " " i) e] (inc indent)])
-           [:tr {:class "border-b border-gray-100"}
-            [:td {:col-span 2 :class "p-0"}
+           [:tr {:class "border-t border-gray-300"}
+            [:td {:col-span 2 :class "p-0 relative"}
+             [:button {:title (str "Collapse  " a "  " v)
+                       :on-click #(reset! open? false)
+                       :class "absolute w-full bottom-0 left-0 border-gray-500 border-b hover:border-b-6 focus:outline-none"}]
              [entity-tree-table v false (inc indent)]]]))])))
 
 (defn entity-tree-avs [eid avs indent]
@@ -124,13 +128,20 @@
                 )]
     (fn []
       [:div {:class "w-full h-full overflow-auto pb-5"}
-       [:label {:class "block pt-1 pl-1"}
-        [:p {:class "font-bold"} "Entity lookup"]
-        [:input {:type "text"
-                 :placeholder "id or lookup ref..."
-                 :class "border py-1 px-2 rounded"
-                 :value @lookup
-                 :on-change #(reset! lookup (.-value (.-target %)))
-                 :on-key-down #(when (= "Enter" (.-key %))
-                                 (reset! entity (d/entity @conn (cljs.reader/read-string @lookup))))}]]
+       [:form {:class "flex items-end"
+               :on-submit
+               (fn [e]
+                 (.preventDefault e)
+                 (reset! entity (d/entity @conn (cljs.reader/read-string @lookup))))}
+        [:label {:class "block pt-1 pl-1"}
+         [:p {:class "font-bold"} "Entity lookup"]
+         [:input {:type "text"
+                  :placeholder "id or [:uniq-attr1 \"v1\" ...]"
+                  :class "border py-1 px-2 rounded w-56"
+                  :value @lookup
+                  :on-change #(reset! lookup (.-value (.-target %)))
+                  }]]
+        [:button {:type "submit" 
+                  :class "ml-1 py-1 px-2 rounded bg-gray-200 border"} 
+         "Get entity"]]
        [entity-tree-table @entity true 0]])))
