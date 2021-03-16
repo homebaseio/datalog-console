@@ -51,9 +51,9 @@
       [:<>
        [:tr {:class "odd:bg-gray-100"}
         [:td {:title (str a)
-              :style {:padding-left (str (+ 0.25 (* 1.5 indent)) "rem")
+              :style {:padding-left (str (+ 0.25 indent) "rem")
                       :max-width "16rem"}
-              :class "pr-1 truncate"}
+              :class "pr-1 box-content truncate"}
          (if entity?
            [:button {:class "pr-1 focus:outline-none"
                      :on-click #(reset! open? (not @open?))}
@@ -76,7 +76,7 @@
              [entity-tree-av [(str a " " i) e] (inc indent)])
            [:tr {:class "border-t border-gray-300"}
             [:td {:col-span 2 :class "p-0 relative"}
-             [:button {:title (str "Collapse  " a "  " v)
+             [:button {:title (str "Collapse  " a "  " (select-keys v [:db/id]))
                        :on-click #(reset! open? false)
                        :class "absolute w-full bottom-0 left-0 border-gray-500 border-b hover:border-b-6 focus:outline-none"}]
              [entity-tree-table v false (inc indent)]]]))])))
