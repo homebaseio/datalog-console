@@ -113,11 +113,10 @@
 
 (defn entity-tree-table [entity head? indent]
   [:table {:class "table-auto w-full"}
-   (when head?
-     [:thead
-      [:tr {:class "font-bold text-left"}
-       [:th {:class "px-1"} "Attribute"]
-       [:th {:class "pl-1"} "Value"]]])
+   [:thead {:class (if head? "" "sr-only")}
+    [:tr {:class "font-bold text-left"}
+     [:th {:class "px-1"} "Attribute"]
+     [:th {:class "pl-1"} "Value"]]]
    [:tbody
     [entity-tree entity indent]]])
 
