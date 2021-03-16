@@ -113,6 +113,7 @@
 
 (defn entity-tree-table [entity head? indent]
   [:table {:class "table-auto w-full"}
+   [:caption {:class "px-1 text-left"} (str "entity :db/id " (:db/id entity))]
    [:thead {:class (if head? "" "sr-only")}
     [:tr {:class "font-bold text-left"}
      [:th {:class "px-1"} "Attribute"]
