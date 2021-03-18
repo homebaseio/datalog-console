@@ -1,10 +1,11 @@
-(ns datalog-console.workspaces.entity-cards
+(ns datalog-console.workspaces.tree-table-cards
   (:require [nubank.workspaces.core :as ws]
             [nubank.workspaces.model :as wsm]
             [nubank.workspaces.card-types.react :as ct.react]
             [reagent.core :as r]
             [datascript.core :as d]
-            [datalog-console.components.entity :as c.entity]))
+            [datalog-console.components.entity :as c.entity]
+            [datalog-console.components.tree-table :as c.tree-table]))
 
 (def conn
   (let [conn (d/create-conn
@@ -39,10 +40,18 @@
                         :employer/person -1}])
     conn))
 
-(ws/defcard entity-card
+(ws/defcard tree-table-card
   {::wsm/align {:flex 1}
    ::wsm/node-props {:style {:overflow "hidden" :padding 0}}}
   (ct.react/react-card
-   (r/as-element [c.entity/entity conn])))
+   (r/as-element
+    [:div {:class "w-full h-full overflow-auto pb-5"}
+     [c.tree-table/tree-table
+      {:caption (str "entity " (select-keys (d/entity @conn 1) [:db/id]))
+       :head-row ["Attribute", "Value"]
+       :rows (c.entity/entity->rows (d/entity @conn 1))
+       :expandable-row? c.entity/expandable-row?
+       :expand-row c.entity/expand-row
+       :render-col c.entity/render-col}]])))
 
 
