@@ -29,15 +29,16 @@
                     :class "pl-1 truncate w-full"}
                (render-col col)])]))]
        (when @open?
-         [:tr {:class "border-t border-gray-300"}
+         [:tr
           [:td {:col-span (count row) :class "p-0 relative"}
-           [tree-table 
+           [tree-table
             (merge props {:level (inc level)
                           :caption nil
                           :rows (expand-row row)})]
-           [:button {:title (str "Collapse  " row)
+           [:button {:title (str "Collapse  " (pr-str row))
                      :on-click #(reset! open? false)
-                     :class "absolute w-full bottom-0 left-0 border-gray-500 border-b hover:border-b-6 focus:outline-none"}]]])])))
+                     :style {:left (str (+ 0.625 level) "rem")}
+                     :class "absolute h-full top-0 left-2.5 border-gray-300 border-l transform hover:border-l-6 hover:-translate-x-0.5 focus:outline-none"}]]])])))
 
 (defn tree-table 
   "Renders `rows` of data in a table `[[col1 col2] [col1 col2]]`. 
