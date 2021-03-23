@@ -7,9 +7,12 @@
             [devtools.formatters.markup :as m]
             [devtools.formatters.templating :refer [render-markup]]
             [devtools.protocols :refer [IFormat]]
+            [devtools.core :as devtools]
             ;; [datalog-console.chrome.formatters :as f]
             [datalog-console.components.entity :as c.entity]
             [datalog-console.workspaces.entity-cards :refer [conn]]))
+
+(devtools/install!)
 
 (defn element [name props & children]
   (apply js/React.createElement name (clj->js props) children))
