@@ -12,7 +12,8 @@
             [datalog-console.components.entity :as c.entity]
             [datalog-console.workspaces.entity-cards :refer [conn]]))
 
-(devtools/install!)
+(devtools/set-pref! :disable-advanced-mode-check true)
+(devtools/install! [:formatters :hints])
 
 (defn element [name props & children]
   (apply js/React.createElement name (clj->js props) children))
