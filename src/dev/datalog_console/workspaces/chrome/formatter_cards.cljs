@@ -8,6 +8,7 @@
             [devtools.formatters.templating :refer [render-markup]]
             [devtools.protocols :refer [IFormat]]
             [devtools.core :as devtools]
+            [clojure.test :refer [is]]
             ;; [datalog-console.chrome.formatters :as f]
             [datalog-console.components.entity :as c.entity]
             [datalog-console.workspaces.entity-cards :refer [conn]]))
@@ -40,3 +41,14 @@
     (js/console.log {:a "b" :1 [1 2 3] :laksdjflaskjdf "alskdjflaksdjflajdsflajsdflkjadlfkjasdlfkjalsdkjflaskdjf" 1 2 3 4 5 6 7 8 9 10})
     (ct.react/react-card
      (element "div" {:className "font-black"} "Open the chrome console"))))
+
+
+(deftype SampleType [a b])
+
+(defrecord SampleRecord [c d e])
+
+(ws/deftest test-cljs$lang$type
+  (is (= (.-cljs$lang$type SampleType) true))
+  (is (= (pr-str SampleType) "datalog-console.workspaces.chrome.formatter-cards/SampleType"))
+  (is (= (.-cljs$lang$type SampleRecord) true))
+  (is (= (pr-str SampleRecord) "datalog-console.workspaces.chrome.formatter-cards/SampleRecord")))
