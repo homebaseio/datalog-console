@@ -3,8 +3,10 @@
             [nubank.workspaces.card-types.react :as ct.react]
             [datascript.core :as d]
             [clojure.test :refer [is]]
-            [datalog-console.chrome.formatters]
+            [datalog-console.chrome.formatters :as formatters]
             [datalog-console.workspaces.entity-cards :refer [conn]]))
+
+(formatters/install!)
 
 (defn element [name props & children]
   (apply js/React.createElement name (clj->js props) children))
