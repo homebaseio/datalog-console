@@ -1,5 +1,7 @@
 node_modules/
 public/app/js
+public/app/out
+public/app/manifest.json
 public/cards/js
 
 /target

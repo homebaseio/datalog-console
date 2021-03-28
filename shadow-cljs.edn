@@ -8,6 +8,11 @@
                 :devtools {:http-root "public/app"
                            :http-port 3001
                            :http-resource-root "."}}
+          :chrome {:target :chrome-extension
+                   :compiler-options {:closure-output-charset "US-ASCII"}
+                   :extension-dir "public/app"
+                   :manifest-file "public/app/manifest.edn"
+                   #_:devtools #_{:devtools-url "http://localhost:3001"}}
           :cards {:target nubank.workspaces.shadow-cljs.target
                   :ns-regexp "-(test|cards)$"
                   :output-dir "public/cards/js"

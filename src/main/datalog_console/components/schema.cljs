@@ -50,15 +50,17 @@
         (v-fn x)}}))
    {} coll))
 
-(defn schema [db]
-  (when db
-    (let [real-schema (coll->schema (:schema db) first last)
+(defn schema [conn]
+  (when conn
+    (let [db @conn
+          real-schema (coll->schema (:schema db) first last)
           inferred-schema (coll->schema (d/datoms db :eavt) :a #(infer-schema (:v %)))
           merged-schemas (deep-merge inferred-schema real-schema)]
       [:div {:class "w-full h-full overflow-auto pb-5"}
        [c.tree-table/tree-table
         {:caption "schema"
          :head-row ["Attribute", "Value"]
+         :full-width? true
          :rows (sort merged-schemas)
          :expandable-row? expandable-row?
          :expand-row expand-row

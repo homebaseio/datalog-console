@@ -3,7 +3,7 @@
 
 (declare tree-table)
 
-(defn table-row [{:keys [level row expandable-row? expand-row render-col] :as props}]
+(defn table-row [{:keys [level row expandable-row? expand-row render-col full-width?] :as props}]
   (let [open? (r/atom false)]
     (fn []
       [:<>
@@ -25,8 +25,8 @@
                (render-col col)]
               [:td {:title (str col)
                     :style {:max-width 0
-                            :min-width 100}
-                    :class "pl-1 truncate w-full"}
+                            :min-width (when-not full-width? 100)}
+                    :class (if full-width? "pl-3 w-full" "pl-3 truncate w-full")}
                (render-col col)])]))]
        (when @open?
          [:tr
@@ -37,7 +37,6 @@
                           :rows (expand-row row)})]
            [:button {:title (str "Collapse  " (pr-str row))
                      :on-click #(reset! open? false)
-                     :style {:left (str (+ 0.625 level) "rem")}
                      :class "absolute h-full top-0 left-2.5 border-gray-300 border-l transform hover:border-l-6 hover:-translate-x-0.5 focus:outline-none"}]]])])))
 
 (defn tree-table 
@@ -45,7 +44,7 @@
    If the row is `(expandable-row? row)` then it will render a caret
    to toggle the `(expand-row row)` function and step down a level in the
    tree. `expand-row` should return a new sequence of rows."
-  [{:keys [level caption head-row rows expandable-row? expand-row render-col] 
+  [{:keys [level caption head-row rows expandable-row? expand-row render-col full-width?] 
     :as props}]
   (let [level (or level 0)
         render-col (or render-col str)
@@ -56,9 +55,11 @@
         caption])
      [:thead {:class (if (= 0 level) "" "sr-only")}
       [:tr {:class "pl-1 font-bold text-left"}
-       (for [col head-row]
+       ^{:key (str "first th " (first head-row))}
+       [:th {:class "pl-1"} (first head-row)]
+       (for [col (rest head-row)]
          ^{:key (str "th-" level "-" (pr-str col))}
-         [:th {:class "pl-1"} col])]]
+         [:th {:class "pl-3"} col])]]
      [:tbody
       (for [row rows]
         ^{:key (str "tr-" level "-" (pr-str row))}
