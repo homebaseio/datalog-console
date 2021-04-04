@@ -13,24 +13,23 @@
     (entity? (first v))
     (entity? v)))
 
-(defn make-keyword-reverse-ref [kw]
+(defn keyword->reverse-ref [kw]
   (keyword (str (namespace kw) "/_" (name kw))))
 
-(defn reverse-refs [entity]
-  (let [rev-ref-attrs-and-eids (d/q '[:find ?ref-attr ?e
-                                      :in $ [?ref-attr ...] ?ref-id
-                                      :where [?e ?ref-attr ?ref-id]]
-                                    (d/entity-db entity)
-                                    (for [[attr props] (:schema (d/entity-db entity))
-                                          :when (= :db.type/ref (:db/valueType props))]
-                                      attr)
-                                    (:db/id entity))
-        rev-ref-eids-grouped-by-attr (group-by first rev-ref-attrs-and-eids)
-        rev-ref-entities-grouped-by-attr (reduce-kv (fn [acc k v]
-                                                      (conj acc [(make-keyword-reverse-ref  k)
-                                                                 (set (map (fn [[_ eid]] (d/entity (d/entity-db entity) eid)) v))]))
-                                                    [] rev-ref-eids-grouped-by-attr)]
-    rev-ref-entities-grouped-by-attr))
+(defn ^:export reverse-refs [entity]
+  (->> (d/q '[:find ?ref-attr ?e
+              :in $ ?ref-id [?ref-attr ...]
+              :where [?e ?ref-attr ?ref-id]]
+            (d/entity-db entity)
+            (:db/id entity)
+            (for [[attr props] (:schema (d/entity-db entity))
+                  :when (= :db.type/ref (:db/valueType props))]
+              attr))
+       (group-by first)
+       (reduce-kv (fn [acc k v]
+                    (conj acc [(keyword->reverse-ref  k)
+                               (set (for [[_ eid] v] (d/entity (d/entity-db entity) eid)))]))
+                  [])))
 
 (defn entity->rows [entity]
   (concat
