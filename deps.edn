@@ -5,4 +5,7 @@
         reagent/reagent {:mvn/version "1.0.0"}
         datascript/datascript {:mvn/version "1.0.7"}
         binaryage/devtools {:mvn/version "1.0.2"}
-        nubank/workspaces {:mvn/version "1.0.16"}}}
+        com.taoensso/timbre {:mvn/version "5.1.2"}
+        com.wsscode/async {:mvn/version "2021.01.15"}
+        nubank/workspaces {:mvn/version "1.0.16"}
+        org.clojure/core.async {:mvn/version "0.4.490"}}}

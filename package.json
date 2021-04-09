@@ -8,21 +8,20 @@
   "license": "MIT",
   "private": false,
   "scripts": {
-    "dev": "shadow-cljs watch cards",
-    "dev:app": "shadow-cljs watch app",
-    "build:tailwind:dev": "postcss public/css/styles.css -o public/app/css/styles.css ; postcss public/css/styles.css -o public/cards/css/styles.css",
-    "build:tailwind:dev:watch": "postcss public/css/styles.css -o public/app/css/styles.css -w & postcss public/css/styles.css -o public/cards/css/styles.css -w && kill $!",
-    "build:tailwind": "NODE_ENV=production postcss public/css/styles.css -o public/app/css/styles.css ; NODE_ENV=production postcss public/css/styles.css -o public/cards/css/styles.css",
-    "build:app": "shadow-cljs release app",
-    "build:cards": "shadow-cljs release cards",
-    "build:chrome": "rm public/app/manifest.json ; rm -rf public/app/out ; shadow-cljs release app chrome",
-    "build": "yarn build:tailwind ; yarn build:app ; yarn build:cards ; yarn build:chrome"
+    "dev": "yarn dev-chrome",
+    "dev-chrome": "shadow-cljs watch chrome-devtools chrome workspaces",
+    "build:tailwind:dev": "postcss public/css/styles.css -o public/css/gen-styles.css",
+    "build:tailwind:dev:watch": "postcss public/css/styles.css -o public/css/gen-styles.css -w",
+    "build:tailwind": "NODE_ENV=production postcss public/css/styles.css -o public/css/gen-styles.css",
+    "build:workspaces": "shadow-cljs release workspaces",
+    "build:chrome": "rm shells/chrome/manifest.json ; rm -rf shells/chrome/out ; shadow-cljs release chrome chrome-devtools",
+    "build": "yarn build:tailwind ; yarn build:workspaces ; yarn build:chrome"
   },
   "devDependencies": {
     "autoprefixer": "^10.2.5",
     "postcss": "^8.2.8",
     "postcss-cli": "^8.3.1",
-    "shadow-cljs": "2.11.25",
+    "shadow-cljs": "^2.11.25",
     "tailwindcss": "^2.0.3"
   },
   "dependencies": {

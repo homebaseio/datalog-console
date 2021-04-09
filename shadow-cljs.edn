@@ -1,27 +1,24 @@
 ;; shadow-cljs configuration
 {:deps true
- :builds {:app {:target :browser
-                :output-dir "public/app/js"
-                :asset-path "/app/js"
-                :compiler-options {:infer-externs true
-                                   :externs ["datascript/externs.js"]}
-                :modules {:main {:init-fn datalog-console.core/init!}}
-                :devtools {:http-root "public/app"
-                           :http-port 3001
-                           :http-resource-root "."}}
+ :builds {:workspaces {:target nubank.workspaces.shadow-cljs.target
+                       :ns-regexp "-(test|cards)$"
+                       :output-dir "public/js/workspaces"
+                       :asset-path "/js/workspakces"
+                       :compiler-options {:externs ["datascript/externs.js"]}
+                       :preloads [] ; optional, list namespaces to be pre loaded
+                       :devtools {:http-root "public"
+                                  :http-port 8084
+                                  :http-resource-root "."
+                                  :devtools-url "http://localhost:9632"}}
           :chrome {:target :chrome-extension
                    :compiler-options {:closure-output-charset "US-ASCII"
                                       :externs ["datascript/externs.js"]}
-                   :extension-dir "public/app"
-                   :manifest-file "public/app/manifest.edn"
-                   #_:devtools #_{:devtools-url "http://localhost:3001"}}
-          :cards {:target nubank.workspaces.shadow-cljs.target
-                  :ns-regexp "-(test|cards)$"
-                  :output-dir "public/cards/js"
-                  :asset-path "/cards/js"
-                  :compiler-options {:infer-externs true
-                                     :externs ["datascript/externs.js"]}
-                  :preloads [] ; optional, list namespaces to be pre loaded
-                  :devtools {:http-root "public/cards"
-                             :http-port 3000
-                             :http-resource-root "."}}}}
+                   :extension-dir "shells/chrome"
+                   :devtools {:devtools-url "http://localhost:9632"}}
+          :chrome-devtool {:target           :browser
+                           :output-dir       "shells/chrome/js/devtool"
+                           :asset-path       "js/devtool"
+                           :compiler-options {:closure-output-charset "US-ASCII"
+                                              :externs ["datascript/externs.js"]}
+                           :devtools         {:devtools-url "http://localhost:9632"}
+                           :modules          {:main {:entries [datalog-console.chrome.extension.devtool.main]}}}          }}

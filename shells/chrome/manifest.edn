@@ -2,10 +2,20 @@
  :name                    "Datalog Console"
  :version                 "0.0.0"
  :description             "Datalog DB administration panel for the chrome console"
- :shadow/outputs          {:content-script
-                           {:chrome/options {:matches ["<all_urls>"]
-                                             :run_at  "document_idle"}}}
- :permissions             ["file:///*" "http://*/*" "https://*/*"]
+ :icons                   {"16"  "favicon.png"
+                           "32"  "favicon.png"
+                           "48"  "favicon.png"
+                           "128" "favicon.png"}
+ :shadow/outputs           {:content-script
+                            {:chrome/options {:matches ["<all_urls>"]
+                                              :run_at  "document_idle"}
+                             :entries        [datalog-console.chrome.extension.content-script.main]}
+
+                            :background
+                            {:chrome/options {:persistent false}
+                             :entries        [datalog-console.chrome.extension.background.main]}}
+
+ :permissions             ["activeTab" "file:///*" "http://*/*" "https://*/*"]
  :externally-connectable  {:ids ["*"]}
  :content-security-policy ["default-src 'self';"
                            "script-src 'self' 'unsafe-eval' http://localhost:3001;"

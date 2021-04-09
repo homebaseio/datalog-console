@@ -1,19 +1,14 @@
-<!-- NOTE: this file lives in the root of the gh-pages branch -->
 <!DOCTYPE html>
 <html>
-  <body>  
-    <script>
-      (async () => {
-        const response = await fetch('https://api.github.com/repos/homebaseio/datalog-console/git/trees/gh-pages');
-        const data = await response.json();
-        let htmlString = '<ul>';
-        for (let file of data.tree.filter(v => v.path !== 'index.html')) {
-          htmlString += `<li><a href="${file.path}/app/index.html">${file.path} app</a></li>`;
-          htmlString += `<li><a href="${file.path}/cards/index.html">${file.path} cards</a></li>`;
-        }
-        htmlString += '</ul>';
-        document.getElementsByTagName('body')[0].innerHTML = htmlString;
-      })()
-    </script>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+    <link href="css/gen-styles.css" rel="stylesheet">
+  </head>
   <body>
+    <div id="app" class="preflight font-mono">Loading Workspaces...</div>
+    <script src="js/main.js" type="text/javascript"></script>
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
+  </body>
 </html>
