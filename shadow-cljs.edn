@@ -3,7 +3,7 @@
  :builds {:workspaces {:target nubank.workspaces.shadow-cljs.target
                        :ns-regexp "-(test|cards)$"
                        :output-dir "public/js/workspaces"
-                       :asset-path "/js/workspakces"
+                       :asset-path "/js/workspaces"
                        :compiler-options {:externs ["datascript/externs.js"]}
                        :preloads [] ; optional, list namespaces to be pre loaded
                        :devtools {:http-root "public"
