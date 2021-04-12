@@ -28,3 +28,4 @@ pom.xml.asc
 .cpcache
 shells/chrome/out
 public/js
+public/css/gen-styles.css
