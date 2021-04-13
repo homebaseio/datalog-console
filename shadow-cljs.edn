@@ -1,6 +1,11 @@
 ;; shadow-cljs configuration
 {:deps true
- ;:repl {:runtime-select :latest}
+ 
+ :http   {:host "localhost"  ;; this should be removed and all devtools-url set to 9630
+          :port 9632}
+
+ :nrepl  {:port 63104}
+ 
  :builds {:workspaces {:target nubank.workspaces.shadow-cljs.target
                        :ns-regexp "-(test|cards)$"
                        :output-dir "public/js/workspaces"
@@ -11,19 +16,21 @@
                                   :http-port 8084
                                   :http-resource-root "."
                                   :devtools-url "http://localhost:9632"}}
+          
           :chrome {:target :chrome-extension
                    :compiler-options {:closure-output-charset "US-ASCII"
                                       :externs ["datascript/externs.js"]
-                                      :source-map-inline true
-                                      }
+                                      :source-map-inline true}
                    :extension-dir "shells/chrome"
                    :devtools {:devtools-url "http://localhost:9632"}}
+          
           :chrome-devtool {:target           :browser
                            :output-dir       "shells/chrome/js/devtool"
                            :asset-path       "js/devtool"
                            :compiler-options {:closure-output-charset "US-ASCII"
                                               :externs ["datascript/externs.js"]
+                                            ;;   :source-map-include-sources-content true
                                             ;;   :source-map-inline true
                                               }
                            :devtools         {:devtools-url "http://localhost:9632"}
-                           :modules          {:main {:entries [datalog-console.chrome.extension.devtool.main]}}}          }}
+                           :modules          {:main {:entries [datalog-console.chrome.extension.devtool.main]}}}}}

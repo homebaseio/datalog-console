@@ -41,6 +41,7 @@
 
 ;; This namespace is what runs in the Chrome panel
 
+(println ::loaded)
 
 
 ;; (declare fill-last-entry!)
@@ -61,11 +62,11 @@
 
 (defonce global-inspector* (atom nil))
 
-(def current-tab-id js/chrome.devtools.inspectedWindow.tabId)
+;(def current-tab-id js/chrome.devtools.inspectedWindow.tabId)
 
 (defn post-message [port type data]
   (.postMessage port #js {:datalog-console-devtool-message (pr-str {:type type :data data :timestamp (js/Date.)})
-                          :tab-id                         current-tab-id}))
+                          :tab-id                         1 #_current-tab-id}))
 
 (defn event-data [event]
   (some-> event (gobj/get "datalog-console-remote-message") cljs.reader/read-string))
@@ -302,7 +303,7 @@
           (<?maybe (handle-remote-message msg))
           (recur))))
     (js/console.log "the port:" port)
-    (.postMessage port #js {:name "init" :tab-id current-tab-id})
+    (.postMessage port #js {:name "init" :tab-id 1 #_current-tab-id})
     (post-message port :datalog-console.client.client/request-page-apps {})
 
     port))
@@ -344,6 +345,7 @@
 ;;          (catch :default e
 ;;            (error e)))))
 ;;    false))
+
 
 (defn start-global-inspector [options]
   (let [port*      (atom nil)
