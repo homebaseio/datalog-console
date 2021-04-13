@@ -9,16 +9,20 @@
  :shadow/outputs           {:content-script
                             {:chrome/options {:matches ["<all_urls>"]
                                               :run_at  "document_idle"}
-                             :entries        [datalog-console.chrome.extension.content-script.main]}
+                             ;:entries        [datalog-console.chrome.extension.content-script.main]
+                             :init-fn        datalog-console.chrome.extension.content-script.main/init
+                             }
 
                             :background
                             {:chrome/options {:persistent false}
-                             :entries        [datalog-console.chrome.extension.background.main]}}
+                             :init-fn        datalog-console.chrome.extension.background.main/init}
+                             ;:entries        [datalog-console.chrome.extension.background.main]}
+                            }
 
- :permissions             ["activeTab" "file:///*" "http://*/*" "https://*/*"]
+ :permissions             ["file:///*" "http://*/*" "https://*/*"]
  :externally-connectable  {:ids ["*"]}
  :content-security-policy ["default-src 'self';"
-                           "script-src 'self' 'unsafe-eval' http://localhost:3001;"
+                           "script-src 'self' 'unsafe-eval' http://localhost:9630;"
                            "connect-src * data: blob: filesystem:;"
                            "style-src 'self' data: chrome-extension-resource: 'unsafe-inline';"
                            "img-src 'self' data: chrome-extension-resource:;"

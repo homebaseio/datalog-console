@@ -1,5 +1,6 @@
 ;; shadow-cljs configuration
 {:deps true
+ ;:repl {:runtime-select :latest}
  :builds {:workspaces {:target nubank.workspaces.shadow-cljs.target
                        :ns-regexp "-(test|cards)$"
                        :output-dir "public/js/workspaces"

@@ -3,6 +3,8 @@ public/app/js
 public/app/out
 public/app/manifest.json
 public/cards/js
+shells/chrome/js
+shells/chrome/manifest.json
 
 /target
 /checkouts

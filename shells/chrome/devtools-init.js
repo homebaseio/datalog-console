@@ -1,7 +1,7 @@
 chrome.devtools.panels.create(
   "Datalog DB",
   "favicon.png",
-  "devtools-init.html",
+  "inspect-panel.html",
   function (panel) {
     console.log("panel initialized", panel);
   }

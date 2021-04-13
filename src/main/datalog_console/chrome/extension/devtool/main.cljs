@@ -1,6 +1,7 @@
 (ns datalog-console.chrome.extension.devtool.main
   (:require
    [clojure.pprint :refer [pprint]]
+   [cljs.reader]
    [cljs.core.async :as async :refer [go <! put!]]
    [com.wsscode.common.async-cljs :refer [<?maybe]]
   ;;  [com.wsscode.pathom.core :as p]
@@ -38,9 +39,11 @@
    ))
 
 
+;; This namespace is what runs in the Chrome panel
 
 
-(declare fill-last-entry!)
+
+;; (declare fill-last-entry!)
 
 ;; (fp/defsc GlobalRoot [this {:keys [ui/root]}]
 ;;   {:initial-state (fn [params] {:ui/root
@@ -54,7 +57,7 @@
 ;;    (cssi/style-element {:component this})
 ;;    (multi-inspector/multi-inspector root)))
 
-(def app-uuid-key :fulcro.inspect.core/app-uuid)
+;; (def app-uuid-key :fulcro.inspect.core/app-uuid)
 
 (defonce global-inspector* (atom nil))
 
@@ -65,16 +68,16 @@
                           :tab-id                         current-tab-id}))
 
 (defn event-data [event]
-  (some-> event (gobj/get "datalog-console-remote-message") clojure.core/read-string))
+  (some-> event (gobj/get "datalog-console-remote-message") cljs.reader/read-string))
 
-(defn inc-id [id]
-  (let [new-id (if-let [[_ prefix d] (re-find #"(.+?)(\d+)$" (str id))]
-                 (str prefix (inc (js/parseInt d)))
-                 (str id "-0"))]
-    (cond
-      (keyword? id) (keyword (subs new-id 1))
-      (symbol? id) (symbol new-id)
-      :else new-id)))
+;; (defn inc-id [id]
+;;   (let [new-id (if-let [[_ prefix d] (re-find #"(.+?)(\d+)$" (str id))]
+;;                  (str prefix (inc (js/parseInt d)))
+;;                  (str id "-0"))]
+;;     (cond
+;;       (keyword? id) (keyword (subs new-id 1))
+;;       (symbol? id) (symbol new-id)
+;;       :else new-id)))
 
 ;; (defn inspector-app-names []
 ;;   (some->> @global-inspector* :reconciler fp/app-state deref ::inspector/id vals
@@ -87,63 +90,64 @@
 ;;         (recur (inc-id new-name))
 ;;         new-name))))
 
-(defonce last-disposed-app* (atom nil))
+;; (defonce last-disposed-app* (atom nil))
 
-(defn start-app [])
+(defn start-app [data]
+  (js/console.log "start-app" data))
 
-#_(defn start-app [{:fulcro.inspect.core/keys   [app-id app-uuid]
-                  :fulcro.inspect.client/keys [initial-history-step remotes]}]
-  (let [{:keys [reconciler] :as inspector} @global-inspector*
-        {initial-state :value} initial-history-step
-        new-inspector (-> (fp/get-initial-state inspector/Inspector initial-state)
-                          (assoc ::inspector/id app-uuid)
-                          (assoc :fulcro.inspect.core/app-id app-id)
-                          (assoc ::inspector/name (dedupe-name app-id))
-                          (assoc-in [::inspector/settings :ui/hide-websocket?] true)
-                          (assoc-in [::inspector/db-explorer ::db-explorer/id] [app-uuid-key app-uuid])
-                          (assoc-in [::inspector/app-state ::data-history/history-id] [app-uuid-key app-uuid])
-                          (assoc-in [::inspector/app-state ::data-history/watcher ::data-watcher/id] [app-uuid-key app-uuid])
-                          (assoc-in [::inspector/app-state ::data-history/watcher ::data-watcher/watches]
-                                    (->> (storage/get [::data-watcher/watches app-id] [])
-                                         (mapv (fn [path]
-                                                 (fp/get-initial-state data-watcher/WatchPin
-                                                                       {:path     path
-                                                                        :expanded (storage/get [::data-watcher/watches-expanded app-id path] {})
-                                                                        :content  (get-in initial-state path)})))))
-                          (assoc-in [::inspector/app-state ::data-history/snapshots] (storage/tget [::data-history/snapshots app-id] []))
-                          (assoc-in [::inspector/network ::network/history-id] [app-uuid-key app-uuid])
-                          (assoc-in [::inspector/element ::element/panel-id] [app-uuid-key app-uuid])
-                          (assoc-in [::inspector/i18n ::i18n/id] [app-uuid-key app-uuid])
-                          (assoc-in [::inspector/i18n ::i18n/current-locale] (-> (get-in initial-state (-> initial-state ::fulcro-i18n/current-locale))
-                                                                                 ::fulcro-i18n/locale))
-                          (assoc-in [::inspector/i18n ::i18n/locales] (->> initial-state ::fulcro-i18n/locale-by-id vals vec
-                                                                           (mapv #(vector (::fulcro-i18n/locale %) (:ui/locale-name %)))))
-                          (assoc-in [::inspector/transactions ::transactions/tx-list-id] [app-uuid-key app-uuid])
-                          (assoc-in [::inspector/oge] (fp/get-initial-state multi-oge/OgeView {:app-uuid app-uuid
-                                                                                               :remotes  remotes}))
-                          (assoc-in [::inspector/index-explorer] (fp/get-initial-state fiex/IndexExplorer
-                                                                                       {:app-uuid app-uuid
-                                                                                        :remotes  remotes})))]
+;; #_(defn start-app [{:fulcro.inspect.core/keys   [app-id app-uuid]
+;;                   :datalog-console.client.client/keys [initial-history-step remotes]}]
+;;   (let [{:keys [reconciler] :as inspector} @global-inspector*
+;;         {initial-state :value} initial-history-step
+;;         new-inspector (-> (fp/get-initial-state inspector/Inspector initial-state)
+;;                           (assoc ::inspector/id app-uuid)
+;;                           (assoc :fulcro.inspect.core/app-id app-id)
+;;                           (assoc ::inspector/name (dedupe-name app-id))
+;;                           (assoc-in [::inspector/settings :ui/hide-websocket?] true)
+;;                           (assoc-in [::inspector/db-explorer ::db-explorer/id] [app-uuid-key app-uuid])
+;;                           (assoc-in [::inspector/app-state ::data-history/history-id] [app-uuid-key app-uuid])
+;;                           (assoc-in [::inspector/app-state ::data-history/watcher ::data-watcher/id] [app-uuid-key app-uuid])
+;;                           (assoc-in [::inspector/app-state ::data-history/watcher ::data-watcher/watches]
+;;                                     (->> (storage/get [::data-watcher/watches app-id] [])
+;;                                          (mapv (fn [path]
+;;                                                  (fp/get-initial-state data-watcher/WatchPin
+;;                                                                        {:path     path
+;;                                                                         :expanded (storage/get [::data-watcher/watches-expanded app-id path] {})
+;;                                                                         :content  (get-in initial-state path)})))))
+;;                           (assoc-in [::inspector/app-state ::data-history/snapshots] (storage/tget [::data-history/snapshots app-id] []))
+;;                           (assoc-in [::inspector/network ::network/history-id] [app-uuid-key app-uuid])
+;;                           (assoc-in [::inspector/element ::element/panel-id] [app-uuid-key app-uuid])
+;;                           (assoc-in [::inspector/i18n ::i18n/id] [app-uuid-key app-uuid])
+;;                           (assoc-in [::inspector/i18n ::i18n/current-locale] (-> (get-in initial-state (-> initial-state ::fulcro-i18n/current-locale))
+;;                                                                                  ::fulcro-i18n/locale))
+;;                           (assoc-in [::inspector/i18n ::i18n/locales] (->> initial-state ::fulcro-i18n/locale-by-id vals vec
+;;                                                                            (mapv #(vector (::fulcro-i18n/locale %) (:ui/locale-name %)))))
+;;                           (assoc-in [::inspector/transactions ::transactions/tx-list-id] [app-uuid-key app-uuid])
+;;                           (assoc-in [::inspector/oge] (fp/get-initial-state multi-oge/OgeView {:app-uuid app-uuid
+;;                                                                                                :remotes  remotes}))
+;;                           (assoc-in [::inspector/index-explorer] (fp/get-initial-state fiex/IndexExplorer
+;;                                                                                        {:app-uuid app-uuid
+;;                                                                                         :remotes  remotes})))]
 
-    (hist/record-history-step! inspector app-uuid initial-history-step)
-    (fill-last-entry!)
+;;     (hist/record-history-step! inspector app-uuid initial-history-step)
+;;     (fill-last-entry!)
 
-    (fp/transact! reconciler [::multi-inspector/multi-inspector "main"]
-                  [`(multi-inspector/add-inspector ~new-inspector)])
+;;     (fp/transact! reconciler [::multi-inspector/multi-inspector "main"]
+;;                   [`(multi-inspector/add-inspector ~new-inspector)])
 
-    (when (= app-id @last-disposed-app*)
-      (reset! last-disposed-app* nil)
-      (fp/transact! reconciler [::multi-inspector/multi-inspector "main"]
-                    [`(multi-inspector/set-app {::inspector/id ~app-uuid})]))
+;;     (when (= app-id @last-disposed-app*)
+;;       (reset! last-disposed-app* nil)
+;;       (fp/transact! reconciler [::multi-inspector/multi-inspector "main"]
+;;                     [`(multi-inspector/set-app {::inspector/id ~app-uuid})]))
 
-    (fp/transact! reconciler
-                  [::db-explorer/id [app-uuid-key app-uuid]]
-                  [`(db-explorer/set-current-state ~initial-history-step) :current-state])
-    (fp/transact! reconciler
-                  [::data-history/history-id [app-uuid-key app-uuid]]
-                  [`(data-history/set-content ~initial-history-step) ::data-history/history])
+;;     (fp/transact! reconciler
+;;                   [::db-explorer/id [app-uuid-key app-uuid]]
+;;                   [`(db-explorer/set-current-state ~initial-history-step) :current-state])
+;;     (fp/transact! reconciler
+;;                   [::data-history/history-id [app-uuid-key app-uuid]]
+;;                   [`(data-history/set-content ~initial-history-step) ::data-history/history])
 
-    new-inspector))
+;;     new-inspector))
 
 ;; (defn dispose-app [{:fulcro.inspect.core/keys [app-uuid]}]
 ;;   (let [{:keys [reconciler] :as inspector} @global-inspector*
@@ -162,7 +166,7 @@
 ;;     (fp/transact! reconciler [::multi-inspector/multi-inspector "main"]
 ;;                   [`(multi-inspector/remove-inspector {::inspector/id ~app-uuid})])))
 
-;; (defn tx-run [{:fulcro.inspect.client/keys [tx tx-ref]}]
+;; (defn tx-run [{:datalog-console.client.client/keys [tx tx-ref]}]
 ;;   (let [{:keys [reconciler]} @global-inspector*]
 ;;     (if tx-ref
 ;;       (fp/transact! reconciler tx-ref tx)
@@ -186,7 +190,7 @@
 ;;   (debounce -fill-last-entry! 250))
 
 ;; (defn update-client-db [{:fulcro.inspect.core/keys   [app-uuid]
-;;                          :fulcro.inspect.client/keys [state-id]}]
+;;                          :datalog-console.client.client/keys [state-id]}]
 ;;   (let [step {:id state-id}]
 ;;     (hist/record-history-step! @global-inspector* app-uuid step)
 
@@ -205,7 +209,7 @@
 ;;                   [`(data-history/set-content ~step) ::data-history/history])))
 
 ;; (defn new-client-tx [{:fulcro.inspect.core/keys   [app-uuid]
-;;                       :fulcro.inspect.client/keys [tx]}]
+;;                       :datalog-console.client.client/keys [tx]}]
 ;;   (let [{:fulcro.history/keys [db-before-id
 ;;                                db-after-id]} tx
 ;;         inspector @global-inspector*
@@ -230,7 +234,7 @@
 ;;   "Called in response to the client sending us the real state for a given state id, at which time we update
 ;;    our copy of the history with the new value"
 ;;   [{:fulcro.inspect.core/keys   [app-uuid state-id]
-;;     :fulcro.inspect.client/keys [diff based-on state]}]
+;;     :datalog-console.client.client/keys [diff based-on state]}]
 ;;   (let [inspector @global-inspector*
 ;;         state     (if state
 ;;                     state
@@ -250,35 +254,35 @@
         ;; :datalog-console.client.client/reload-db
         ;; (reload-db data)
 
-        :datalog-console.client.client/db-changed!
-        (update-client-db data)
+        ;; :datalog-console.client.client/db-changed!
+        ;; (update-client-db data)
 
-        :datalog-console.client.client/new-client-transaction
-        (new-client-tx data)
+        ;; :datalog-console.client.client/new-client-transaction
+        ;; (new-client-tx data)
 
-        :datalog-console.client.client/history-entry
-        (fill-history-entry data)
+        ;; :datalog-console.client.client/history-entry
+        ;; (fill-history-entry data)
 
-        :datalog-console.client.client/transact-inspector
-        (tx-run data)
+        ;; :datalog-console.client.client/transact-inspector
+        ;; (tx-run data)
 
-        :datalog-console.client.client/reset
-        (reset-inspector)
+        ;; :datalog-console.client.client/reset
+        ;; (reset-inspector)
 
-        :datalog-console.client.client/dispose-app
-        (dispose-app data)
+        ;; :datalog-console.client.client/dispose-app
+        ;; (dispose-app data)
 
-        :datalog-console.client.client/set-active-app
-        (set-active-app data)
+        ;; :datalog-console.client.client/set-active-app
+        ;; (set-active-app data)
 
-        :datalog-console.client.client/message-response
-        (if-let [res-chan (get @responses* (::ui-parser/msg-id data))]
-          (put! res-chan (::ui-parser/msg-response data)))
+        ;; :datalog-console.client.client/message-response
+        ;; (if-let [res-chan (get @responses* (::ui-parser/msg-id data))]
+        ;;   (put! res-chan (::ui-parser/msg-response data)))
 
-        :datalog-console.client.client/client-version
-        (let [client-version (:version data)]
-          (if (= -1 (version/compare client-version version/last-inspect-version))
-            (notify-stale-app)))
+        ;; :datalog-console.client.client/client-version
+        ;; (let [client-version (:version data)]
+        ;;   (if (= -1 (version/compare client-version version/last-inspect-version))
+        ;;     (notify-stale-app)))
 
         (log/debug "Unknown message" type)))))
 
@@ -297,68 +301,69 @@
         (when-let [msg (<! message-handler-ch)]
           (<?maybe (handle-remote-message msg))
           (recur))))
-
+    (js/console.log "the port:" port)
     (.postMessage port #js {:name "init" :tab-id current-tab-id})
-    (post-message port :fulcro.inspect.client/request-page-apps {})
+    (post-message port :datalog-console.client.client/request-page-apps {})
 
     port))
 
-(defn respond-locally! [responses* type data]
-  (if-let [res-chan (get @responses* (::ui-parser/msg-id data))]
-    (put! res-chan (::ui-parser/msg-response data))
-    (log/error "Failed to respond locally to message:" type "with data:" data)))
+;; (defn respond-locally! [responses* type data]
+;;   (if-let [res-chan (get @responses* (::ui-parser/msg-id data))]
+;;     (put! res-chan (::ui-parser/msg-response data))
+;;     (log/error "Failed to respond locally to message:" type "with data:" data)))
 
-(defn ?handle-local-message [responses* type data]
-  (case type
-    :fulcro.inspect.client/load-settings
-    (let [settings (into {}
-                         (remove (comp #{::not-found} second))
-                         (for [k (:query data)]
-                           [k (storage/get k ::not-found)]))]
-      (respond-locally! responses* type
-                        {::ui-parser/msg-response settings
-                         ::ui-parser/msg-id       (::ui-parser/msg-id data)})
-      :ok)
-    :fulcro.inspect.client/save-settings
-    (do
-      (doseq [[k v] data]
-        (log/trace "Saving setting:" k "=>" v)
-        (storage/set! k v))
-      :ok)
-    #_else nil))
+;; (defn ?handle-local-message [responses* type data]
+;;   (case type
+;;     :datalog-console.client.client/load-settings
+;;     (let [settings (into {}
+;;                          (remove (comp #{::not-found} second))
+;;                          (for [k (:query data)]
+;;                            [k (storage/get k ::not-found)]))]
+;;       (respond-locally! responses* type
+;;                         {::ui-parser/msg-response settings
+;;                          ::ui-parser/msg-id       (::ui-parser/msg-id data)})
+;;       :ok)
+;;     :datalog-console.client.client/save-settings
+;;     (do
+;;       (doseq [[k v] data]
+;;         (log/trace "Saving setting:" k "=>" v)
+;;         (storage/set! k v))
+;;       :ok)
+;;     #_else nil))
 
-(defn make-network [port* parser responses*]
-  (pfn/fn-network
-   (fn [this edn ok error]
-     (go
-       (try
-         (ok (<! (parser {:send-message (fn [type data]
-                                          (or
-                                           (?handle-local-message responses* type data)
-                                           (post-message @port* type data)))
-                          :responses*   responses*} edn)))
-         (catch :default e
-           (error e)))))
-   false))
+;; (defn make-network [port* parser responses*]
+;;   (pfn/fn-network
+;;    (fn [this edn ok error]
+;;      (go
+;;        (try
+;;          (ok (<! (parser {:send-message (fn [type data]
+;;                                           (or
+;;                                            (?handle-local-message responses* type data)
+;;                                            (post-message @port* type data)))
+;;                           :responses*   responses*} edn)))
+;;          (catch :default e
+;;            (error e)))))
+;;    false))
 
 (defn start-global-inspector [options]
   (let [port*      (atom nil)
         responses* (atom {})
-        app        (fulcro/new-fulcro-client
-                    :started-callback
-                    (fn [app]
-                      (reset! port* (event-loop app responses*))
-                      (post-message @port* :fulcro.inspect.client/check-client-version {})
-                      (settings/load-settings (:reconciler app)))
+        _ (reset! port* (event-loop nil responses*))
+        ;; #_app        #_(fulcro/new-fulcro-client
+        ;;             :started-callback
+        ;;             (fn [app]
+        ;;               (reset! port* (event-loop app responses*))
+        ;;               (post-message @port* :datalog-console.client.client/check-client-version {})
+        ;;               (settings/load-settings (:reconciler app)))
 
-                    :shared
-                    {::hist/db-hash-index (atom {})}
+        ;;             :shared
+        ;;             {::hist/db-hash-index (atom {})}
 
-                    :networking
-                    (make-network port* (ui-parser/parser) responses*))
+        ;;             :networking
+        ;;             (make-network port* (ui-parser/parser) responses*))
         node       (js/document.createElement "div")]
     (js/document.body.appendChild node)
-    (fulcro/mount app GlobalRoot node)))
+    #_(fulcro/mount app GlobalRoot node)))
 
 (defn global-inspector
   ([] @global-inspector*)
