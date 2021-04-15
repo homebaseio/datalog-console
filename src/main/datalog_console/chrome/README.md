@@ -1,4 +1,4 @@
-# Datalo Chrome Extension
+# Datalog Chrome Extension
 
 
 ## Development
@@ -16,8 +16,18 @@ yarn dev
 
 
 To view the background page click here
+
 ![Datalog Console Extension background page](../../../../docs/datalog-extension.jpg)
 
-To view the datalog panel click open the Chrome console.
+To view the datalog panel open the Chrome console with either of these options.
+- Right click anywhere on the page -> Inspect
 - **Option + ⌘ + J**   (on macOS)
 - **Shift + CTRL + J** (on Windows/Linux)
+
+## Connect REPL
+
+To connect to the background page
+`yarn shadow-cljs cljs-repl chrome`
+
+To connect to the devtool panel in the chrome console
+`yarn shadow-cljs cljs-repl chrome-devtool`
