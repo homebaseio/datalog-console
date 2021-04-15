@@ -26,8 +26,11 @@ To view the datalog panel open the Chrome console with either of these options.
 
 ## Connect REPL
 
-To connect to the background page
-`yarn shadow-cljs cljs-repl chrome`
+You can connect a repl to each process by opening new windows in your terminal and doing the following.
 
-To connect to the devtool panel in the chrome console
-`yarn shadow-cljs cljs-repl chrome-devtool`
+- `yarn repl-background` - for the background page
+- `yarn repl-panel` - for the devtool panel console
+
+## Quirks
+
+Execution of code inside of `content-script` will not run on `www.google.com`

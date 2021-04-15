@@ -1,8 +1,7 @@
 {"description":
  "Datalog DB administration panel for the chrome console",
  "devtools_page":"devtools.html",
- "permissions":
- ["activeTab", "file:///*", "http://*/*", "https://*/*"],
+ "permissions":["file:///*", "http://*/*", "https://*/*"],
  "browser_action":
  {"default_icon":
   {"16":"favicon.png",
@@ -158,7 +157,7 @@
   "48":"favicon.png",
   "128":"favicon.png"},
  "content_security_policy":
- "default-src 'self'; script-src 'self' 'unsafe-eval' http://localhost:3001; connect-src * data: blob: filesystem:; style-src 'self' data: chrome-extension-resource: 'unsafe-inline'; img-src 'self' data: chrome-extension-resource:; frame-src 'self' data: chrome-extension-resource:; font-src 'self' data: chrome-extension-resource:; media-src * data: blob: filesystem:;",
+ "default-src 'self'; script-src 'self' 'unsafe-eval' http://localhost:9630; connect-src * data: blob: filesystem:; style-src 'self' data: chrome-extension-resource: 'unsafe-inline'; img-src 'self' data: chrome-extension-resource:; frame-src 'self' data: chrome-extension-resource:; font-src 'self' data: chrome-extension-resource:; media-src * data: blob: filesystem:;",
  "content_scripts":
  [{"js":
    ["out/content-script.js", "out/cljs-runtime/goog.debug.error.js",
@@ -303,6 +302,6 @@
     "out/cljs-runtime/datalog_console.chrome.extension.content_script.main.js",
     "out/cljs-runtime/shadow.module.content-script.append.js"],
    "matches":["<all_urls>"],
-   "run_at":"document_idle"}],
+   "run_at":"document_end"}],
  "manifest_version":2,
  "version":"0.0.0"}

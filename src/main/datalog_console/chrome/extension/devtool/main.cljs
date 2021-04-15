@@ -62,11 +62,11 @@
 
 (defonce global-inspector* (atom nil))
 
-;(def current-tab-id js/chrome.devtools.inspectedWindow.tabId)
+(def current-tab-id js/chrome.devtools.inspectedWindow.tabId)
 
 (defn post-message [port type data]
   (.postMessage port #js {:datalog-console-devtool-message (pr-str {:type type :data data :timestamp (js/Date.)})
-                          :tab-id                         1 #_current-tab-id}))
+                          :tab-id                         current-tab-id}))
 
 (defn event-data [event]
   (some-> event (gobj/get "datalog-console-remote-message") cljs.reader/read-string))
@@ -303,7 +303,7 @@
           (<?maybe (handle-remote-message msg))
           (recur))))
     (js/console.log "the port:" port)
-    (.postMessage port #js {:name "init" :tab-id 1 #_current-tab-id})
+    ;; (.postMessage (js/chrome.runtime.connect #js {:name "datalog-console-devtool"}) #js {:datalog-console-devtool-message "init" :tab-id js/chrome.devtools.inspectedWindow.tabId})
     (post-message port :datalog-console.client.client/request-page-apps {})
 
     port))

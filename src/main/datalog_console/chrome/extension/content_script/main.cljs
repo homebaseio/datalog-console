@@ -4,10 +4,9 @@
             [fulcro.inspect.remote.transit :as encode]))
 
 
-(defn init []
-  (println "Content script init"))
+ (defn init []
+   (println "Content script init"))
 
-(println ::loaded)
 
 
 
@@ -30,6 +29,21 @@
 ;;     (swap! active-messages* assoc id (async/promise-chan))
 ;;     data))
 
+(let [port (js/chrome.runtime.connect #js {:name "datalog-console-remote"})]
+    ;; (set! (.. js/document -body -style -backgroundColor) "red")
+  #_(let [the-para (.createElement js/document "button")]
+    (set! (.-innerText the-para) "hello world")
+    (.appendChild js/document.body the-para))
+
+  (.addListener (gobj/get port "onMessage")
+                (fn [msg]
+
+                  (println "MSG" msg)
+                  (.postMessage js/window "pinging ya back" "*")
+                  )))
+
+
+
 ;; (defn setup-new-port 
 ;;   "addListener is fired when a message is sent from either an extension process (by sendMessage) or a content script (by tabs.sendMessage)."
 ;;   []
@@ -38,7 +52,7 @@
 ;;                   (fn [msg]
 ;;                     (cond
 ;;                       (gobj/getValueByKeys msg "datalog-console-devtool-message")
-;;                       (.postMessage js/window msg "*") ;; Q: Why is there a asterix here?
+;;                       (.postMessage js/window msg "*") 
 
 ;;                       :else
 ;;                       (when-let [ch (some->> (gobj/getValueByKeys msg "__datalog-console-msg-id")
@@ -70,7 +84,7 @@
 
 ;;       (.postMessage js/window #js {:datalog-console-start-consume true} "*")
 
-;;       (js/console.log "Hello world!" port*)
+  
 
 ;;       (go-loop []
 ;;         (when-let [data (<! content-script->background-chan)]
