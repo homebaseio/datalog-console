@@ -8,6 +8,7 @@
    [goog.object :as gobj]
    [taoensso.timbre :as log]
    [datalog-console.workspaces.entity-cards :refer [conn]]
+   [datalog-console.components.schema :as c.schema]
    [datalog-console.components.entity :as c.entity]
    [datascript.core :as d]
    ))
@@ -37,7 +38,7 @@
                     (let [db-conn (d/conn-from-db (clojure.edn/read-string
                                                    {:readers d/data-readers} db-str))]
 
-                      (reset! remote-conn db-conn)))))
+                      (reset! remote-conn {:db db-conn :time (js/Date.)})))))
 
   (.postMessage port #js {:name "init" :tab-id current-tab-id})
   (post-message port :hello-console/type {}))
@@ -46,15 +47,27 @@
 
 
 (defn root []
-  (fn []
-    [:div
-     [:h1 "Datalog Console"]
-     [:button
-      {:on-click #(post-message devtool-port :db-request {})}
-      "Fetch the db"]
-     (if @remote-conn
-       [c.entity/entity @remote-conn]
-       [:h2 "No database available"])]))
+  (let [view-state (r/atom nil)]
+    (fn []
+      [:div {:class "my-4 mx-6"}
+       [:div {:class "flex flex-wrap mb-6 align-center"}
+        [:h1 {:class "text-3xl mr-4"} "Datalog Console"]
+        [:div {:class "flex flex-wrap justify-between items-center"}
+         [:button
+          {:class "p-2 bg-green-700 rounded border solid font-bold text-white" 
+           :on-click #(post-message devtool-port :db-request {})}
+          "Refresh database"]
+         (when @remote-conn [:span {:class "ml-4"} "Last refresh: " (str (:time @remote-conn))])]]
+
+       (if @remote-conn
+         [:div {:class "flex flex-wrap"}
+          [:div {:class "[ w-96 border rounded-md ] [ md:w-1/4 ]"}
+           [c.schema/schema (:db @remote-conn)]]
+          [:div {:class "[ w-96 border rounded-md mt-4 ] [ md:ml-4 md:flex-grow md:mt-0 ]"}
+
+           [c.entity/entity (:db @remote-conn)]]]
+         
+         [:h2 "No database available"])])))
 
 (defn mount! []
   (rdom/render [root] (js/document.getElementById "root")))

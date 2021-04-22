@@ -5,6 +5,7 @@ public/app/manifest.json
 public/cards/js
 shells/chrome/js
 shells/chrome/manifest.json
+shells/chrome/gen-styles.css
 
 /target
 /checkouts
