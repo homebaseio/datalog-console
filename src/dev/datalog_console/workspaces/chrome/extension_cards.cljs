@@ -19,10 +19,11 @@
                         
                         "db-request"
                         (let [db-string (pr-str @conn)]
+                          (js/console.log "application recieved *db* request")
                           (swap! counter inc)
-                          
-                          (.postMessage js/window "db-forward" "*")
+                          ;; (.postMessage js/window "db-forward" "*")
                           (.postMessage js/window #js {:datalog-remote-message db-string} "*")
+                          (println "application sent the *db* to *content script*")
                           #_(js/console.log (pr-str conn)))
                         
                         (js/console.log "Ignoring (workspace)" (gobj/get event "data")))))

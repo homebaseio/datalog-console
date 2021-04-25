@@ -10,7 +10,7 @@
 
 
 (defn handle-devtool-message [devtool-port message _port]
-  (js/console.log "handling devtool message:" (gobj/get message "name") message _port devtool-port)
+  #_(js/console.log "handling devtool message:" (gobj/get message "name") message _port devtool-port)
   (cond
     (= "init" (gobj/get message "name"))
     (let [tab-id (gobj/get message "tab-id")]
@@ -20,6 +20,7 @@
     (gobj/getValueByKeys message "devtool-message")
     (let [tab-id      (gobj/get message "tab-id")
           remote-port (get @remote-conns* tab-id)]
+      (js/console.log #js {:name "devtool-message" :tab-id tab-id :message message})
       (.postMessage remote-port message))))
 
 
@@ -36,7 +37,7 @@
     (gobj/getValueByKeys message "datalog-remote-message")
     (let [tab-id (gobj/getValueByKeys port "sender" "tab" "id")
           devtool-port (get @tools-conns* tab-id)]
-
+      (js/console.log #js {:name "datalog-remote-message" :tab-id tab-id :message message})
       (.postMessage (get @tools-conns* tab-id) message))))
 
 (js/chrome.runtime.onConnect.addListener

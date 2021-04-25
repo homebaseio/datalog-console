@@ -11,20 +11,13 @@
               (fn [msg]
                 (println "MSG" msg)
 
-                ;; (println "requesting db")
+                (println "*content script* requesting *db*")
                 (.postMessage js/window "db-request" "*")
-                (.postMessage port #js {:content-script-message "test"})))
+                #_(.postMessage port #js {:content-script-message "test"})))
 
 (.addEventListener js/window "message"
                    (fn [event]
-                    ;;  (println "content-script")
                      (when (and (identical? (.-source event) js/window)
                                 (gobj/getValueByKeys event "data" "datalog-remote-message"))
-                       (.postMessage port (gobj/get event "data")))
-                     (case (gobj/get event "data")
-
-                       "db-forward"
-                       (do
-                         (js/console.log "db-forward from workspace" event))
-
-                       (js/console.log "Ignoring (content-script)" (gobj/get event "data")))))
+                       (println "*content script* forwarding the *db*")
+                       (.postMessage port (gobj/get event "data")))))

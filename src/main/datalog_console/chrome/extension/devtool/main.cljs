@@ -33,15 +33,15 @@
 (let [port devtool-port]
   (.addListener (gobj/get port "onMessage")
                 (fn [msg]
-                  (println "content-script-message got from keys: " (gobj/getValueByKeys msg "content-script-message"))
                   (when-let [db-str (gobj/getValueByKeys msg "datalog-remote-message")]
+                    (js/console.log #js {:name "datalog-remote-message" :msg msg})
                     (let [db-conn (d/conn-from-db (clojure.edn/read-string
                                                    {:readers d/data-readers} db-str))]
 
                       (reset! remote-conn {:db db-conn :time (js/Date.)})))))
 
   (.postMessage port #js {:name "init" :tab-id current-tab-id})
-  (post-message port :hello-console/type {}))
+  #_(post-message port :hello-console/type {}))
 
 
 
@@ -55,7 +55,9 @@
         [:div {:class "flex flex-wrap justify-between items-center"}
          [:button
           {:class "p-2 bg-green-700 rounded border solid font-bold text-white" 
-           :on-click #(post-message devtool-port :db-request {})}
+           :on-click #(do
+                       (println "*panel* making a *db-request*")
+                       (post-message devtool-port :db-request {}))}
           "Refresh database"]
          (when @remote-conn [:span {:class "ml-4"} "Last refresh: " (str (:time @remote-conn))])]]
 
