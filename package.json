@@ -15,8 +15,9 @@
     "build:tailwind:dev": "postcss public/css/styles.css -o public/css/gen-styles.css",
     "build:tailwind:dev:watch": "postcss public/css/styles.css -o public/css/gen-styles.css -w",
     "build:tailwind": "NODE_ENV=production postcss public/css/styles.css -o public/css/gen-styles.css; NODE_ENV=production postcss public/css/styles.css -o shells/chrome/css/get-styles.css",
+    "dev-workspaces": "shadow-cljs watch workspaces",
     "build:workspaces": "shadow-cljs release workspaces",
-    "build:chrome": "rm shells/chrome/manifest.json ; rm -rf shells/chrome/out ; shadow-cljs release chrome chrome-devtools",
+    "build:chrome": "rm shells/chrome/manifest.json ; rm -rf shells/chrome/out ; shadow-cljs release chrome chrome-devtool",
     "build": "yarn build:tailwind ; yarn build:workspaces ; yarn build:chrome"
   },
   "devDependencies": {
