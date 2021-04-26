@@ -20,7 +20,10 @@
     (gobj/getValueByKeys message "devtool-message")
     (let [tab-id      (gobj/get message "tab-id")
           remote-port (get @remote-conns* tab-id)]
-      (js/console.log #js {:name "devtool-message" :tab-id tab-id :message message})
+      (js/console.log #js {:name "devtool-message"
+                           :remote-port remote-port
+                           :tab-id tab-id 
+                           :message message})
       (.postMessage remote-port message))))
 
 
@@ -31,8 +34,7 @@
     (gobj/getValueByKeys message "content-script-message")
     (let [tab-id (gobj/getValueByKeys port "sender" "tab" "id")
           devtool-port (get @tools-conns* tab-id)]
-      (.postMessage (get @tools-conns* tab-id) message)
-)
+      (.postMessage (get @tools-conns* tab-id) message))
 
     (gobj/getValueByKeys message "datalog-remote-message")
     (let [tab-id (gobj/getValueByKeys port "sender" "tab" "id")
@@ -47,6 +49,8 @@
      "content-script"
      (let [listener (partial handle-remote-message port)
            tab-id   (gobj/getValueByKeys port "sender" "tab" "id")]
+       
+       (println "content-script handling")
 
        (swap! remote-conns* assoc tab-id port)
 

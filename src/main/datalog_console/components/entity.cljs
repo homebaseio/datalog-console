@@ -50,13 +50,28 @@
 
 (defn entity [conn]
   (let [lookup (r/atom "")
-        entity (r/atom nil)]
+        entity (r/atom nil)
+        counter (r/atom 0) ; counter for experiment
+        entity-view-count (r/atom 0) ; counter for experiment
+        ]
     (fn []
       [:div {:class "w-full h-full overflow-auto pb-5"}
+       ;; experiment for the database changes 
+       [:p (str conn)]
+       [:button {:on-click #(do
+                              (swap! counter inc)
+                              (let [counter @counter]
+                                (d/transact! conn [{:db/id 1
+                                                    :name "A"
+                                                    :description (str "change counter " counter)}])))} "change db"]
+       [:p (str "changed the db " @counter " times")]
+       [:p (str "viewed entity " @entity-view-count " times")]
+       ;; end experiment
        [:form {:class "flex items-end"
                :on-submit
                (fn [e]
                  (.preventDefault e)
+                 (swap! entity-view-count inc) ; for experiment
                  (reset! entity (d/entity @conn (cljs.reader/read-string @lookup))))}
         [:label {:class "block pt-1 pl-1"}
          [:p {:class "font-bold"} "Entity lookup"]
@@ -77,3 +92,5 @@
            :expandable-row? expandable-row?
            :expand-row expand-row
            :render-col render-col}])])))
+
+

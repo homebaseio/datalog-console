@@ -17,6 +17,7 @@
 (println ::loaded)
 
 (def remote-conn (r/atom nil))
+(def db-refresh-counter (r/atom 0))
 
 
 (def current-tab-id js/chrome.devtools.inspectedWindow.tabId)
@@ -38,6 +39,7 @@
                     (let [db-conn (d/conn-from-db (clojure.edn/read-string
                                                    {:readers d/data-readers} db-str))]
 
+                      (swap! db-refresh-counter inc)
                       (reset! remote-conn {:db db-conn :time (js/Date.)})))))
 
   (.postMessage port #js {:name "init" :tab-id current-tab-id})
@@ -49,27 +51,35 @@
 (defn root []
   (let [view-state (r/atom nil)]
     (fn []
-      [:div {:class "my-4 mx-6"}
-       [:div {:class "flex flex-wrap mb-6 align-center"}
-        [:h1 {:class "text-3xl mr-4"} "Datalog Console"]
-        [:div {:class "flex flex-wrap justify-between items-center"}
-         [:button
-          {:class "p-2 bg-green-700 rounded border solid font-bold text-white" 
-           :on-click #(do
-                       (println "*panel* making a *db-request*")
-                       (post-message devtool-port :db-request {}))}
-          "Refresh database"]
-         (when @remote-conn [:span {:class "ml-4"} "Last refresh: " (str (:time @remote-conn))])]]
+      (let [remote-conn @remote-conn
+            remote-db (:db remote-conn)
+            _ (println "running the view function")]
+        [:div {:class "my-4 mx-6"}
+         [:div {:class "flex flex-wrap mb-6 align-center"}
+          [:h1 {:class "text-3xl mr-4"} "Datalog Console"]
+          [:div {:class "flex flex-wrap justify-between items-center"}
+           [:button
+            {:class "p-2 bg-green-700 rounded border solid font-bold text-white"
+             :on-click #(do
+                          (println "*panel* making a *db-request*")
+                          (post-message devtool-port :db-request {}))}
+            "Refresh database"]
+           (when remote-conn [:span {:class "ml-4"} "Last refresh: " (str (:time remote-conn))])]]
 
-       (if @remote-conn
-         [:div {:class "flex flex-wrap"}
-          [:div {:class "[ w-96 border rounded-md ] [ md:w-1/4 ]"}
-           [c.schema/schema (:db @remote-conn)]]
-          [:div {:class "[ w-96 border rounded-md mt-4 ] [ md:ml-4 md:flex-grow md:mt-0 ]"}
+         (if remote-conn
+           [:div
+            [:p (str "called refresh " @db-refresh-counter " times")]
 
-           [c.entity/entity (:db @remote-conn)]]]
-         
-         [:h2 "No database available"])])))
+            [:p (str (:time remote-conn))]
+            [:p (str (d/pull @remote-db [:name :description] 1))]
+            [:div {:class "flex flex-wrap"}
+             [:div {:class "[ w-96 border rounded-md ] [ md:w-1/4 ]"}
+              [c.schema/schema remote-db]]
+             [:div {:class "[ w-96 border rounded-md mt-4 ] [ md:ml-4 md:flex-grow md:mt-0 ]"}
+
+              [c.entity/entity remote-db]]]]
+
+           [:h2 "No database available"])]))))
 
 (defn mount! []
   (rdom/render [root] (js/document.getElementById "root")))
