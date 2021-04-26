@@ -1,6 +1,8 @@
 (ns datalog-console.components.entity
   (:require [datascript.core :as d]
             [reagent.core :as r]
+            [cljs.reader]
+            [goog.object]
             [datalog-console.components.tree-table :as c.tree-table]))
 
 (defn entity? [v]
@@ -48,49 +50,32 @@
     (entity? col) (str (select-keys col [:db/id]))
     :else (str col)))
 
-(defn entity [conn]
-  (let [lookup (r/atom "")
-        entity (r/atom nil)
-        counter (r/atom 0) ; counter for experiment
-        entity-view-count (r/atom 0) ; counter for experiment
-        ]
-    (fn []
-      [:div {:class "w-full h-full overflow-auto pb-5"}
-       ;; experiment for the database changes 
-       [:p (str conn)]
-       [:button {:on-click #(do
-                              (swap! counter inc)
-                              (let [counter @counter]
-                                (d/transact! conn [{:db/id 1
-                                                    :name "A"
-                                                    :description (str "change counter " counter)}])))} "change db"]
-       [:p (str "changed the db " @counter " times")]
-       [:p (str "viewed entity " @entity-view-count " times")]
-       ;; end experiment
-       [:form {:class "flex items-end"
-               :on-submit
-               (fn [e]
-                 (.preventDefault e)
-                 (swap! entity-view-count inc) ; for experiment
-                 (reset! entity (d/entity @conn (cljs.reader/read-string @lookup))))}
-        [:label {:class "block pt-1 pl-1"}
-         [:p {:class "font-bold"} "Entity lookup"]
-         [:input {:type "text"
-                  :placeholder "id or [:uniq-attr1 \"v1\" ...]"
-                  :class "border py-1 px-2 rounded w-56"
-                  :value @lookup
-                  :on-change #(reset! lookup (.-value (.-target %)))
-                  }]]
-        [:button {:type "submit" 
-                  :class "ml-1 py-1 px-2 rounded bg-gray-200 border"} 
-         "Get entity"]]
-       (when @entity
-         [c.tree-table/tree-table
-          {:caption (str "entity " (select-keys @entity [:db/id]))
-           :head-row ["Attribute", "Value"]
-           :rows (entity->rows @entity)
-           :expandable-row? expandable-row?
-           :expand-row expand-row
-           :render-col render-col}])])))
+(defn entity []
+  (let [lookup (r/atom "")]
+    (fn [conn]
+      (let [entity (d/entity @conn (cljs.reader/read-string @lookup))]
+        [:div {:class "w-full h-full overflow-auto pb-5"}
+         [:form {:class "flex items-end"
+                 :on-submit
+                 (fn [e]
+                   (.preventDefault e)
+                   (reset! lookup (goog.object/getValueByKeys e #js ["target" "elements" "lookup" "value"])))}
+          [:label {:class "block pt-1 pl-1"}
+           [:p {:class "font-bold"} "Entity lookup"]
+           [:input {:type "text"
+                    :name "lookup"
+                    :placeholder "id or [:uniq-attr1 \"v1\" ...]"
+                    :class "border py-1 px-2 rounded w-56"}]]
+          [:button {:type "submit"
+                    :class "ml-1 py-1 px-2 rounded bg-gray-200 border"}
+           "Get entity"]]
+         (when entity
+           [c.tree-table/tree-table
+            {:caption (str "entity " (select-keys entity [:db/id]))
+             :head-row ["Attribute", "Value"]
+             :rows (entity->rows entity)
+             :expandable-row? expandable-row?
+             :expand-row expand-row
+             :render-col render-col}])]))))
 
 

@@ -8,6 +8,7 @@
    [goog.object :as gobj]
    [taoensso.timbre :as log]
    [datalog-console.workspaces.entity-cards :refer [conn]]
+   [datalog-console.components.core :as console]
    [datalog-console.components.schema :as c.schema]
    [datalog-console.components.entity :as c.entity]
    [datascript.core :as d]
@@ -16,39 +17,40 @@
 
 (println ::loaded)
 
-(def remote-conn (r/atom nil))
-(def db-refresh-counter (r/atom 0))
+;; (def remote-conn (r/atom nil))
+;; (def db-refresh-counter (r/atom 0))
 
 
-(def current-tab-id js/chrome.devtools.inspectedWindow.tabId)
+;; (def current-tab-id js/chrome.devtools.inspectedWindow.tabId)
 
-(def create-port #(js/chrome.runtime.connect #js {:name %}))
-(def devtool-port (create-port "devtool"))
+;; (def create-port #(js/chrome.runtime.connect #js {:name %}))
+;; (def devtool-port (create-port "devtool"))
 
-(defn post-message [port type data]
-  (.postMessage port #js {:devtool-message (pr-str {:type type :data data :timestamp (js/Date.)})
-                          :tab-id        current-tab-id}))
-
-
-
-(let [port devtool-port]
-  (.addListener (gobj/get port "onMessage")
-                (fn [msg]
-                  (when-let [db-str (gobj/getValueByKeys msg "datalog-remote-message")]
-                    (js/console.log #js {:name "datalog-remote-message" :msg msg})
-                    (let [db-conn (d/conn-from-db (clojure.edn/read-string
-                                                   {:readers d/data-readers} db-str))]
-
-                      (swap! db-refresh-counter inc)
-                      (reset! remote-conn {:db db-conn :time (js/Date.)})))))
-
-  (.postMessage port #js {:name "init" :tab-id current-tab-id})
-  #_(post-message port :hello-console/type {}))
+;; (defn post-message [port type data]
+;;   (.postMessage port #js {:devtool-message (pr-str {:type type :data data :timestamp (js/Date.)})
+;;                           :tab-id        current-tab-id}))
 
 
 
+;; (let [port devtool-port]
+;;   (.addListener (gobj/get port "onMessage")
+;;                 (fn [msg]
+;;                   (when-let [db-str (gobj/getValueByKeys msg "datalog-remote-message")]
+;;                     (js/console.log #js {:name "datalog-remote-message" :msg msg})
+;;                     (let [db-conn (d/conn-from-db (clojure.edn/read-string
+;;                                                    {:readers d/data-readers} db-str))]
 
-(defn root []
+;;                       (println "test")
+;;                       (swap! db-refresh-counter inc)
+;;                       (reset! remote-conn {:db db-conn :time (js/Date.)})))))
+
+;;   (.postMessage port #js {:name "init" :tab-id current-tab-id})
+;;   #_(post-message port :hello-console/type {}))
+
+
+
+
+#_(defn root []
   (let [view-state (r/atom nil)]
     (fn []
       (let [remote-conn @remote-conn
@@ -82,7 +84,7 @@
            [:h2 "No database available"])]))))
 
 (defn mount! []
-  (rdom/render [root] (js/document.getElementById "root")))
+  (rdom/render [console/root] (js/document.getElementById "root")))
 
 (defn init! []
   (mount!))
