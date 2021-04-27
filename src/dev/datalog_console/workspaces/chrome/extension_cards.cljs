@@ -7,21 +7,22 @@
 
 
 
+(defn install []
+  (js/document.documentElement.setAttribute "__datalog-inspect-remote-installed__" true))
 
-(def counter (atom 0))
+(install)
+
 
 
 (.addEventListener js/window "message"
                    (fn [event] 
                      (when-let [devtool-message (gobj/getValueByKeys event "data" "devtool-message")]
-                       (let [msg-type (:type (cljs.reader/read-string devtool-message))
-                             _ (js/console.log "msg-type: " msg-type)]
+                       (let [msg-type (:type (cljs.reader/read-string devtool-message))]
+                         
                          (case msg-type
 
-                           :request-whole-database-as-string
-                           (let [db-string (pr-str @conn)]
-                             (swap! counter inc)
-                             (.postMessage js/window #js {:datalog-remote-message db-string} "*"))
+                           :datalog-console.client/request-whole-database-as-string
+                           (.postMessage js/window #js {:datalog-remote-message (pr-str @conn)} "*")
 
                            nil)))))
 
@@ -33,7 +34,5 @@
 
 (ws/defcard chrome-extension-card
   (ct.react/react-card
-   counter
    (element "div" {}
-            (element "div" {:className "font-black"} "Install the chrome extension and the open datalog panel. It should connect to the running datascript DB in this card.")
-            (str "DB Requested " @counter " times."))))
+            (element "div" {:className "font-black"} "Install the chrome extension and the open datalog panel. It should connect to the running datascript DB in this card."))))

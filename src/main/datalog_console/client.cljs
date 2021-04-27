@@ -1,4 +1,4 @@
-(ns datalog-console.components.core
+(ns datalog-console.client
   (:require [reagent.dom :as rdom]
             [reagent.core :as r]
             [datalog-console.components.schema :as c.schema]
@@ -7,9 +7,7 @@
             [goog.object :as gobj]
             [cljs.reader]))
 
-; get the serialized DB off of a postMessage
-; created a new db from that string
-; re-render
+
 
 (def rconn (r/atom (d/create-conn {})))
 
@@ -40,7 +38,7 @@
                      {:class "p-2 bg-green-700 rounded border solid font-bold text-white"
                       :on-click #(do
                                    (println "*panel* making a *db-request*")
-                                   (post-message devtool-port :request-whole-database-as-string {}))}  
+                                   (post-message devtool-port ::request-whole-database-as-string {}))}  
                      "Refresh database"]
                     [:div {:class "w-80 border-r"}
                      [c.schema/schema @rconn]]

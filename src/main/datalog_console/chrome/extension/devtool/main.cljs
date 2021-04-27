@@ -2,7 +2,7 @@
   (:require [clojure.edn]
             [cljs.reader]
             [reagent.dom :as rdom]
-            [datalog-console.components.core :as console]))
+            [datalog-console.client :as console]))
 
 
 (println ::loaded)

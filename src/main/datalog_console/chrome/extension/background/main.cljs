@@ -26,16 +26,30 @@
       (.postMessage remote-port message))))
 
 
-(defn handle-remote-message [remote-port message port]
+(defn set-icon-and-popup [tab-id]
+  (js/chrome.browserAction.setIcon
+   #js {:tabId tab-id
+        :path  #js {"16"  "images/active/icon-16.png"
+                    "32"  "images/active/icon-16.png"
+                    "48"  "images/active/icon-16.png"
+                    "128" "images/active/icon-16.png"}})
+  (js/chrome.browserAction.setPopup
+   #js {:tabId tab-id
+        :popup "popups/enabled.html"}))
 
+
+(defn handle-remote-message [_remote-port message port]
   (let [tab-id (gobj/getValueByKeys port "sender" "tab" "id")]
+    
+    (js/console.log "remote message: " message)
     (cond
-    ; send message to devtool
-      (gobj/getValueByKeys message "content-script-message")
+      ; send message to devtool
+      (gobj/getValueByKeys message "datalog-remote-message")
       (.postMessage (get @tools-conns* tab-id) message)
 
-      (gobj/getValueByKeys message "datalog-remote-message")
-      (.postMessage (get @tools-conns* tab-id) message))))
+      ; set icon and popup
+      (gobj/getValueByKeys message "datalog-db-detected")
+      (set-icon-and-popup tab-id))))
 
 (js/chrome.runtime.onConnect.addListener
  (fn [port]

@@ -5,6 +5,9 @@
 
 (def port (js/chrome.runtime.connect #js {:name "content-script"}))
 
+(when (js/document.documentElement.getAttribute "__datalog-inspect-remote-installed__")
+  (.postMessage port #js {:datalog-db-detected true}))
+
 (.addListener (gobj/get port "onMessage")
               (fn [msg]
                 (when (gobj/get msg "devtool-message")
@@ -14,5 +17,4 @@
                    (fn [event]
                      (when (and (identical? (.-source event) js/window)
                                 (gobj/getValueByKeys event "data" "datalog-remote-message"))
-                       (println "*content script* forwarding the *db*")
                        (.postMessage port (gobj/get event "data")))))
