@@ -1,7 +1,5 @@
 (ns datalog-console.chrome.extension.content-script.main
-  (:require [goog.object :as gobj]
-            [clojure.string :as str]
-            [cljs.core.async :as async :refer [go go-loop chan <! put!]]))
+  (:require [goog.object :as gobj]))
 
 
 

@@ -2,7 +2,6 @@
   (:require [nubank.workspaces.core :as ws]
             [goog.object :as gobj]
             [nubank.workspaces.card-types.react :as ct.react]
-            [datascript.core :as d]
             [datalog-console.workspaces.entity-cards :refer [conn]]))
 
 

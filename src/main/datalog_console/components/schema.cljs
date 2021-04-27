@@ -1,6 +1,5 @@
 (ns datalog-console.components.schema
   (:require [datascript.core :as d]
-            [reagent.core :as r]
             [datalog-console.components.tree-table :as c.tree-table]))
 
 (defn deep-merge [v & vs]

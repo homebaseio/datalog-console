@@ -1,87 +1,12 @@
 (ns datalog-console.chrome.extension.devtool.main
-  (:require
-   [clojure.pprint :refer [pprint]]
-   [clojure.edn]
-   [cljs.reader]
-   [reagent.dom :as rdom]
-   [reagent.core :as r]
-   [goog.object :as gobj]
-   [taoensso.timbre :as log]
-   [datalog-console.workspaces.entity-cards :refer [conn]]
-   [datalog-console.components.core :as console]
-   [datalog-console.components.schema :as c.schema]
-   [datalog-console.components.entity :as c.entity]
-   [datascript.core :as d]
-   ))
+  (:require [clojure.edn]
+            [cljs.reader]
+            [reagent.dom :as rdom]
+            [datalog-console.components.core :as console]))
 
 
 (println ::loaded)
 
-;; (def remote-conn (r/atom nil))
-;; (def db-refresh-counter (r/atom 0))
-
-
-;; (def current-tab-id js/chrome.devtools.inspectedWindow.tabId)
-
-;; (def create-port #(js/chrome.runtime.connect #js {:name %}))
-;; (def devtool-port (create-port "devtool"))
-
-;; (defn post-message [port type data]
-;;   (.postMessage port #js {:devtool-message (pr-str {:type type :data data :timestamp (js/Date.)})
-;;                           :tab-id        current-tab-id}))
-
-
-
-;; (let [port devtool-port]
-;;   (.addListener (gobj/get port "onMessage")
-;;                 (fn [msg]
-;;                   (when-let [db-str (gobj/getValueByKeys msg "datalog-remote-message")]
-;;                     (js/console.log #js {:name "datalog-remote-message" :msg msg})
-;;                     (let [db-conn (d/conn-from-db (clojure.edn/read-string
-;;                                                    {:readers d/data-readers} db-str))]
-
-;;                       (println "test")
-;;                       (swap! db-refresh-counter inc)
-;;                       (reset! remote-conn {:db db-conn :time (js/Date.)})))))
-
-;;   (.postMessage port #js {:name "init" :tab-id current-tab-id})
-;;   #_(post-message port :hello-console/type {}))
-
-
-
-
-#_(defn root []
-  (let [view-state (r/atom nil)]
-    (fn []
-      (let [remote-conn @remote-conn
-            remote-db (:db remote-conn)
-            _ (println "running the view function")]
-        [:div {:class "my-4 mx-6"}
-         [:div {:class "flex flex-wrap mb-6 align-center"}
-          [:h1 {:class "text-3xl mr-4"} "Datalog Console"]
-          [:div {:class "flex flex-wrap justify-between items-center"}
-           [:button
-            {:class "p-2 bg-green-700 rounded border solid font-bold text-white"
-             :on-click #(do
-                          (println "*panel* making a *db-request*")
-                          (post-message devtool-port :db-request {}))}
-            "Refresh database"]
-           (when remote-conn [:span {:class "ml-4"} "Last refresh: " (str (:time remote-conn))])]]
-
-         (if remote-conn
-           [:div
-            [:p (str "called refresh " @db-refresh-counter " times")]
-
-            [:p (str (:time remote-conn))]
-            [:p (str (d/pull @remote-db [:name :description] 1))]
-            [:div {:class "flex flex-wrap"}
-             [:div {:class "[ w-96 border rounded-md ] [ md:w-1/4 ]"}
-              [c.schema/schema remote-db]]
-             [:div {:class "[ w-96 border rounded-md mt-4 ] [ md:ml-4 md:flex-grow md:mt-0 ]"}
-
-              [c.entity/entity remote-db]]]]
-
-           [:h2 "No database available"])]))))
 
 (defn mount! []
   (rdom/render [console/root] (js/document.getElementById "root")))

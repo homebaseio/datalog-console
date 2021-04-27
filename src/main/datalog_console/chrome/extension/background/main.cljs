@@ -1,6 +1,5 @@
 (ns datalog-console.chrome.extension.background.main
-  (:require [goog.object :as gobj]
-            [cljs.core.async :as async :refer [go-loop chan <! put!]]))
+  (:require [goog.object :as gobj]))
 
 
 (println ::loaded)
