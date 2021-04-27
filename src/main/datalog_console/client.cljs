@@ -25,7 +25,6 @@
 (let [port devtool-port]
   (.addListener (gobj/get port "onMessage")
                 (fn [msg]
- 
                   (when-let [db-str (gobj/getValueByKeys msg "datalog-remote-message")]
                     (reset! rconn (d/conn-from-db (cljs.reader/read-string db-str))))))
 
@@ -33,17 +32,15 @@
 
   
 (defn root []
-  [:div {:class "font-sans text-xs h-screen w-full flex flex-row"}
-                    [:button
-                     {:class "p-2 bg-green-700 rounded border solid font-bold text-white"
-                      :on-click #(do
-                                   (println "*panel* making a *db-request*")
-                                   (post-message devtool-port ::request-whole-database-as-string {}))}  
-                     "Refresh database"]
-                    [:div {:class "w-80 border-r"}
-                     [c.schema/schema @rconn]]
-                    [:div {:class "flex-auto"}
-                     [c.entity/entity @rconn]]])
+  [:div {:class "relative font-sans text-xs h-screen w-full flex flex-row"}
+   [:button
+    {:class "[ p-2 absolute top-5 right-5 bg-green-700 rounded solid font-bold text-white border-2 border-black] [ hover:bg-white hover:text-green-700 ]"
+     :on-click #(post-message devtool-port ::request-whole-database-as-string {})}
+    "Refresh database"]
+   [:div {:class "w-80 border-r"}
+    [c.schema/schema @rconn]]
+   [:div {:class "flex-auto"}
+    [c.entity/entity @rconn]]])
 
 (defn mount! []
   (rdom/render [root] (js/document.getElementById "root")))

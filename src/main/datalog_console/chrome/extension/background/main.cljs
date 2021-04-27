@@ -2,28 +2,19 @@
   (:require [goog.object :as gobj]))
 
 
-(println ::loaded)
-
 (defonce tools-conns* (atom {}))
 (defonce remote-conns* (atom {}))
 
 
 (defn handle-devtool-message [devtool-port message _port]
-  #_(js/console.log "handling devtool message:" (gobj/get message "name") message _port devtool-port)
-  (cond
-    (= "init" (gobj/get message "name"))
-    (let [tab-id (gobj/get message "tab-id")]
+  (let [tab-id (gobj/get message "tab-id")]
+    (cond
+      (= "init" (gobj/get message "name"))
       (swap! tools-conns* assoc tab-id devtool-port)
-      (js/console.log #js {:name "init" :tab-id tab-id :message message}))
 
-    (gobj/getValueByKeys message "devtool-message")
-    (let [tab-id      (gobj/get message "tab-id")
-          remote-port (get @remote-conns* tab-id)]
-      (js/console.log #js {:name "devtool-message"
-                           :remote-port remote-port
-                           :tab-id tab-id 
-                           :message message})
-      (.postMessage remote-port message))))
+      ;; send message to content-script
+      (gobj/getValueByKeys message "devtool-message")
+      (.postMessage (get @remote-conns* tab-id) message))))
 
 
 (defn set-icon-and-popup [tab-id]
@@ -40,8 +31,6 @@
 
 (defn handle-remote-message [_remote-port message port]
   (let [tab-id (gobj/getValueByKeys port "sender" "tab" "id")]
-    
-    (js/console.log "remote message: " message)
     (cond
       ; send message to devtool
       (gobj/getValueByKeys message "datalog-remote-message")
@@ -58,8 +47,6 @@
      "content-script"
      (let [listener (partial handle-remote-message port)
            tab-id   (gobj/getValueByKeys port "sender" "tab" "id")]
-       
-       (println "content-script handling")
 
        (swap! remote-conns* assoc tab-id port)
 
@@ -70,7 +57,6 @@
 
      "devtool"
      (let [listener (partial handle-devtool-message port)]
-       #_(js/console.log "devtool port: " port)
 
        (.addListener (gobj/get port "onMessage") listener)
        #_(.addListener (gobj/get port "onDisconnet")
