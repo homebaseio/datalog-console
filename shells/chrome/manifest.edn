@@ -2,10 +2,10 @@
  :name                    "Datalog Console"
  :version                 "0.0.0"
  :description             "Datalog DB administration panel for the chrome console"
- :icons                   {"16"  "favicon.png"
-                           "32"  "favicon.png"
-                           "48"  "favicon.png"
-                           "128" "favicon.png"}
+ :icons                   {"16"  "images/default/icon-16.png"
+                           "32"  "images/default/icon-16.png"
+                           "48"  "images/default/icon-16.png"
+                           "128" "images/default/icon-16.png"}
  :shadow/outputs           {:content-script
                             {:chrome/options {:matches ["<all_urls>"]
                                               :run_at  "document_end" #_"document_idle"}
@@ -29,9 +29,9 @@
                            "frame-src 'self' data: chrome-extension-resource:;"
                            "font-src 'self' data: chrome-extension-resource:;"
                            "media-src * data: blob: filesystem:;"]
- :browser-action          {:default-icon  {"16"  "favicon.png"
-                                           "32"  "favicon.png"
-                                           "48"  "favicon.png"
-                                           "128" "favicon.png"}
+ :browser-action          {:default-icon  {"16"  "images/default/icon-16.png"
+                                           "32"  "images/default/icon-16.png"
+                                           "48"  "images/default/icon-16.png"
+                                           "128" "images/default/icon-16.png"}
                            :default-popup "popups/disabled.html"}
  :devtools-page           "devtools.html"}
