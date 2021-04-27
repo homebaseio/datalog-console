@@ -7,11 +7,8 @@
 
 (.addListener (gobj/get port "onMessage")
               (fn [msg]
-                (println "MSG" msg)
-
-                (println "*content script* requesting *db*")
-                (.postMessage js/window "db-request" "*")
-                #_(.postMessage port #js {:content-script-message "test"})))
+                (when (gobj/get msg "devtool-message")
+                  (.postMessage js/window msg "*"))))
 
 (.addEventListener js/window "message"
                    (fn [event]

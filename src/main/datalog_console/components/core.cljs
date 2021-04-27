@@ -27,11 +27,9 @@
 (let [port devtool-port]
   (.addListener (gobj/get port "onMessage")
                 (fn [msg]
-                  (js/console.log "message" msg)
+ 
                   (when-let [db-str (gobj/getValueByKeys msg "datalog-remote-message")]
-                    (js/console.log #js {:name "datalog-remote-message" :foo :bar :msg msg})
-                    (let [_ (js/console.log "before conn-from-db")]
-                      (reset! rconn (d/conn-from-db (cljs.reader/read-string db-str)))))))
+                    (reset! rconn (d/conn-from-db (cljs.reader/read-string db-str))))))
 
   (.postMessage port #js {:name "init" :tab-id current-tab-id}))
 
@@ -42,7 +40,7 @@
                      {:class "p-2 bg-green-700 rounded border solid font-bold text-white"
                       :on-click #(do
                                    (println "*panel* making a *db-request*")
-                                   (post-message devtool-port :db-request {}))}  ;; TODO: rename to request whole database as string
+                                   (post-message devtool-port :request-whole-database-as-string {}))}  
                      "Refresh database"]
                     [:div {:class "w-80 border-r"}
                      [c.schema/schema @rconn]]

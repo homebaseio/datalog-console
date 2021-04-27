@@ -28,17 +28,13 @@
 
 (defn handle-remote-message [remote-port message port]
 
-  (cond
+  (let [tab-id (gobj/getValueByKeys port "sender" "tab" "id")]
+    (cond
     ; send message to devtool
-    (gobj/getValueByKeys message "content-script-message")
-    (let [tab-id (gobj/getValueByKeys port "sender" "tab" "id")
-          devtool-port (get @tools-conns* tab-id)]
-      (.postMessage (get @tools-conns* tab-id) message))
+      (gobj/getValueByKeys message "content-script-message")
+      (.postMessage (get @tools-conns* tab-id) message)
 
-    (gobj/getValueByKeys message "datalog-remote-message")
-    (let [tab-id (gobj/getValueByKeys port "sender" "tab" "id")
-          devtool-port (get @tools-conns* tab-id)]
-      (js/console.log #js {:name "datalog-remote-message" :tab-id tab-id :message message})
+      (gobj/getValueByKeys message "datalog-remote-message")
       (.postMessage (get @tools-conns* tab-id) message))))
 
 (js/chrome.runtime.onConnect.addListener
