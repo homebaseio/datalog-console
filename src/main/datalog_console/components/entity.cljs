@@ -51,7 +51,8 @@
     :else (str col)))
 
 (defn entity []
-  (let [lookup (r/atom "")]
+  (let [lookup (r/atom "")
+        view-state (r/atom #{})]
     (fn [conn]
       (let [entity (d/entity @conn (cljs.reader/read-string @lookup))]
         [:div {:class "w-full h-full overflow-auto pb-5"}
@@ -59,7 +60,8 @@
                  :on-submit
                  (fn [e]
                    (.preventDefault e)
-                   (reset! lookup (goog.object/getValueByKeys e #js ["target" "elements" "lookup" "value"])))}
+                   (reset! lookup (goog.object/getValueByKeys e #js ["target" "elements" "lookup" "value"]))
+                   (reset! view-state #{}))}
           [:label {:class "block pt-1 pl-1"}
            [:p {:class "font-bold"} "Entity lookup"]
            [:input {:type "text"
@@ -76,6 +78,7 @@
              :rows (entity->rows entity)
              :expandable-row? expandable-row?
              :expand-row expand-row
-             :render-col render-col}])]))))
+             :render-col render-col
+             :view-state view-state}])]))))
 
 
