@@ -44,7 +44,7 @@
                                                               (filter #(< level (:level %)))
                                                               (filter #(subnest? table-id (:table-id %))))
                                                        new-view-state (clojure.set/difference orig-view-state (into #{} xform orig-view-state))]
-                                                   (reset! view-state new-view-state)
+                                                   (reset! view-state new-view-state) ; this collapses all nested entities
                                                    (swap! view-state disj row-id))
                                                  (swap! view-state conj row-id)))
                                              (reset! open? (not @open?)))}
