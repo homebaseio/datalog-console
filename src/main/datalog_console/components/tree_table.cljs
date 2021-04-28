@@ -1,5 +1,6 @@
 (ns datalog-console.components.tree-table
-  (:require [reagent.core :as r]))
+  (:require [reagent.core :as r]
+            [clojure.set]))
 
 (declare tree-table)
 
@@ -7,7 +8,15 @@
 
 ;; TODO:
 ;; (1) When updating deeply nested values they do not trigger a refresh of the UI
-;; (2) Refactory unique row id generation. Perhaps see if this can be done in the `entity` ns
+;; (2) Refactor unique row id generation. Perhaps see if this can be done in the `entity` ns
+
+(defn subnest? [current-nest other-nest]
+    (let [[current-c other-c] (map count [current-nest other-nest])]
+      (if (< other-c current-c)
+        true
+        (let [subvec? (= (subvec other-nest 0 current-c)
+                         current-nest)]
+          subvec?))))
 
 (defn table-row [{:keys [level row expandable-row? expand-row render-col full-width? view-state table-id] :as props}]
   (let [open? (r/atom false)]
@@ -28,10 +37,16 @@
                    (do (when view-state (reset! open? (contains? @view-state row-id)))
                        [:button {:class "pr-1 focus:outline-none"
                                  :on-click (fn []
-                                             (when view-state (if (contains? @view-state row-id)
-                                                                (do (swap! view-state disj row-id)
-                                                                    (reset! view-state (set (filter #(<= (:level %) level) @view-state))))
-                                                                (swap! view-state conj row-id)))
+                                             (when view-state
+                                               (if (contains? @view-state row-id)
+                                                 (let [orig-view-state @view-state
+                                                       xform (comp
+                                                              (filter #(< level (:level %)))
+                                                              (filter #(subnest? table-id (:table-id %))))
+                                                       new-view-state (clojure.set/difference orig-view-state (into #{} xform orig-view-state))]
+                                                   (reset! view-state new-view-state)
+                                                   (swap! view-state disj row-id))
+                                                 (swap! view-state conj row-id)))
                                              (reset! open? (not @open?)))}
                         (if @open? "▼" "▶")])
                    [:span {:class "pr-1 invisible"} "▶"])
@@ -85,7 +100,5 @@
         ^{:key (str "tr-" level "-" (pr-str row))}
         [table-row (merge props
                           {:row row
-                           :table-id (concat table-id-acc 
-                                             (if (= :db/id (ffirst rows))
-                                               [(-> rows first second)]
-                                               [(-> rows first second :db/id)]))})])]]))
+                           :table-id (vec (conj table-id-acc (or (-> rows first second :db/id) (-> rows first second))))})])]]))
+

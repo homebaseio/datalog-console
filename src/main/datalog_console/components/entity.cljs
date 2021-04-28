@@ -80,6 +80,7 @@
              :expandable-row? expandable-row?
              :expand-row expand-row
              :render-col render-col
+             :table-id @lookup
              :view-state view-state}])]))))
 
 
