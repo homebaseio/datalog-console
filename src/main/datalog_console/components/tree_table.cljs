@@ -6,17 +6,18 @@
 
 
 ;; TODO:
-;; Certain rows do not have uniqueness in the UI state management and therefore expand and collapse multiple when they are the same attribute
-;; When updating deeply nested values they do not trigger a refresh of the UI
-(defn table-row [{:keys [level row expandable-row? expand-row render-col full-width? view-state] :as props}]
+;; (1) When updating deeply nested values they do not trigger a refresh of the UI
+;; (2) Refactory unique row id generation. Perhaps see if this can be done in the `entity` ns
+
+(defn table-row [{:keys [level row expandable-row? expand-row render-col full-width? view-state table-id] :as props}]
   (let [open? (r/atom false)]
     (fn []
       [:<>
        [:tr {:class "odd:bg-gray-100"}
         (doall
          (for [[i col] (map-indexed vector row)]
-           (let [row-id {:level level :col col}]
-             ^{:key (str {:level level :col col})}
+           (let [row-id {:level level :col col :table-id table-id}]
+             ^{:key (str row-id)}
              [:<>
               (if (= 0 i)
                 [:td {:title (str col)
@@ -27,14 +28,10 @@
                    (do (when view-state (reset! open? (contains? @view-state row-id)))
                        [:button {:class "pr-1 focus:outline-none"
                                  :on-click (fn []
-                                             (js/console.log "inside the for function")
-                                             (js/console.log "row level" level)
                                              (when view-state (if (contains? @view-state row-id)
                                                                 (do (swap! view-state disj row-id)
-                                                                    (reset! view-state (set (filter #(<= (:level %) level) @view-state)))
-                                                                    (js/console.log "this is the filter" (filter #(<= (:level %) level) @view-state)))
+                                                                    (reset! view-state (set (filter #(<= (:level %) level) @view-state))))
                                                                 (swap! view-state conj row-id)))
-                                             (when view-state (js/console.log "this is the view state: " @view-state))
                                              (reset! open? (not @open?)))}
                         (if @open? "▼" "▶")])
                    [:span {:class "pr-1 invisible"} "▶"])
@@ -50,12 +47,15 @@
            [tree-table
             (merge props {:level (inc level)
                           :caption nil
-                          :rows (expand-row row)})]
+                          :rows (expand-row row)
+                          :table-id-acc table-id})]
            [:button {:title (str "Collapse  " (pr-str row))
                      :on-click (fn []
                                  (let [row-id {:level level :col (first row)}]
                                    (swap! view-state disj row-id)
-                                   (reset! view-state (set (filter #(and (<= (:level %) level) (= :col (:col row-id))) @view-state))))
+                                   (reset! view-state (set (filter #(and (<= (:level %) level) 
+                                                                         (= (:col @view-state) (:col row-id))) 
+                                                                   @view-state))))
                                  (reset! open? false))
                      :class "absolute h-full top-0 left-2.5 border-gray-300 border-l transform hover:border-l-6 hover:-translate-x-0.5 focus:outline-none"}]]])])))
 
@@ -64,7 +64,7 @@
    If the row is `(expandable-row? row)` then it will render a caret
    to toggle the `(expand-row row)` function and step down a level in the
    tree. `expand-row` should return a new sequence of rows."
-  [{:keys [level caption head-row rows expandable-row? expand-row render-col full-width?] 
+  [{:keys [level caption head-row rows expandable-row? expand-row render-col full-width? table-id-acc] 
     :as props}]
   (let [level (or level 0)
         render-col (or render-col str)
@@ -83,4 +83,9 @@
      [:tbody
       (for [row rows]
         ^{:key (str "tr-" level "-" (pr-str row))}
-        [table-row (merge props {:row row})])]]))
+        [table-row (merge props
+                          {:row row
+                           :table-id (concat table-id-acc 
+                                             (if (= :db/id (ffirst rows))
+                                               [(-> rows first second)]
+                                               [(-> rows first second :db/id)]))})])]]))
