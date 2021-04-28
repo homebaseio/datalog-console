@@ -60,8 +60,9 @@
                  :on-submit
                  (fn [e]
                    (.preventDefault e)
-                   (reset! lookup (goog.object/getValueByKeys e #js ["target" "elements" "lookup" "value"]))
-                   (reset! view-state #{}))}
+                   (let [current-lookup (goog.object/getValueByKeys e #js ["target" "elements" "lookup" "value"])]
+                     (when-not (= @lookup current-lookup) (reset! view-state #{}))
+                     (reset! lookup current-lookup)))}
           [:label {:class "block pt-1 pl-1"}
            [:p {:class "font-bold"} "Entity lookup"]
            [:input {:type "text"
