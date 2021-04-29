@@ -50,11 +50,15 @@
     (entity? col) (str (select-keys col [:db/id]))
     :else (str col)))
 
+
+(def rerender (atom 0))
+
 (defn entity []
   (let [lookup (r/atom "")
         view-state (r/atom #{})]
     (fn [conn]
-      (let [entity (d/entity @conn (cljs.reader/read-string @lookup))]
+      (let [entity (d/entity @conn (cljs.reader/read-string @lookup))
+            _ (swap! rerender inc)]
         [:div {:class "w-full h-full overflow-auto pb-5"}
          [:form {:class "flex items-end"
                  :on-submit
@@ -73,6 +77,7 @@
                     :class "ml-1 py-1 px-2 rounded bg-gray-200 border"}
            "Get entity"]]
          (when entity
+           ^{:key @rerender}
            [c.tree-table/tree-table
             {:caption (str "entity " (select-keys entity [:db/id]))
              :head-row ["Attribute", "Value"]
