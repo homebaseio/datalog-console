@@ -34,7 +34,7 @@
 (defn root []
   [:div {:class "relative font-sans text-xs h-screen w-full flex flex-row"}
    [:button
-    {:class "[ p-2 absolute top-5 right-5 bg-green-700 rounded solid font-bold text-white border-2 border-black] [ hover:bg-white hover:text-green-700 ]"
+    {:class "[ z-10 p-2 absolute top-5 right-5 bg-green-700 rounded solid font-bold text-white border-2 border-black] [ hover:bg-white hover:text-green-700 ]"
      :on-click #(post-message devtool-port ::request-whole-database-as-string {})}
     "Refresh database"]
    [:div {:class "w-80 border-r"}
