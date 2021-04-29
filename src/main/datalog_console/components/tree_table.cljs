@@ -4,19 +4,26 @@
 
 (declare tree-table)
 
-
+(def tree-table-counter (atom 0))
 
 ;; TODO:
-;; (1) When updating deeply nested values they do not trigger a refresh of the UI
-;; (2) Refactor unique row id generation. Perhaps see if this can be done in the `entity` ns
+;; Refactor to remove entity specific code into entity namespace
 
 (defn subnest? [current-nest other-nest]
-    (let [[current-c other-c] (map count [current-nest other-nest])]
-      (if (< other-c current-c)
-        true
-        (let [subvec? (= (subvec other-nest 0 current-c)
-                         current-nest)]
-          subvec?))))
+  (let [[current-c other-c] (map count [current-nest other-nest])]
+    (if (< other-c current-c)
+      true
+      (let [subvec? (= (subvec other-nest 0 current-c)
+                       current-nest)]
+        subvec?))))
+
+(defn event-modifiers
+  "Given a keydown event, return the modifier keys that were being held."
+  [e]
+  (into [] (filter identity [(when (.-shiftKey e) "shift")
+                             (when (.-altKey e) "alt")
+                             (when (.-ctrlKey e) "ctrl")
+                             (when (.-metaKey e) "meta")])))
 
 (defn table-row [{:keys [level row expandable-row? expand-row render-col full-width? view-state table-id] :as props}]
   (let [open? (r/atom false)]
@@ -36,15 +43,17 @@
                  (if (expandable-row? row)
                    (do (when view-state (reset! open? (contains? @view-state row-id)))
                        [:button {:class "pr-1 focus:outline-none"
-                                 :on-click (fn []
+                                 :on-click (fn [e]
                                              (when view-state
                                                (if (contains? @view-state row-id)
-                                                 (let [orig-view-state @view-state
-                                                       xform (comp
-                                                              (filter #(< level (:level %)))
-                                                              (filter #(subnest? table-id (:table-id %))))
-                                                       new-view-state (clojure.set/difference orig-view-state (into #{} xform orig-view-state))]
-                                                   (reset! view-state new-view-state) ; this collapses all nested entities
+                                                 (do
+                                                   (when (contains? (set (event-modifiers e)) "shift")
+                                                     (let [orig-view-state @view-state
+                                                           xform (comp
+                                                                  (filter #(< level (:level %)))
+                                                                  (filter #(subnest? table-id (:table-id %))))
+                                                           new-view-state (clojure.set/difference orig-view-state (into #{} xform orig-view-state))]
+                                                       (reset! view-state new-view-state))) ; this collapses all nested entities
                                                    (swap! view-state disj row-id))
                                                  (swap! view-state conj row-id)))
                                              (reset! open? (not @open?)))}
@@ -68,18 +77,18 @@
                      :on-click (fn []
                                  (let [row-id {:level level :col (first row)}]
                                    (swap! view-state disj row-id)
-                                   (reset! view-state (set (filter #(and (<= (:level %) level) 
-                                                                         (= (:col @view-state) (:col row-id))) 
+                                   (reset! view-state (set (filter #(and (<= (:level %) level)
+                                                                         (= (:col @view-state) (:col row-id)))
                                                                    @view-state))))
                                  (reset! open? false))
                      :class "absolute h-full top-0 left-2.5 border-gray-300 border-l transform hover:border-l-6 hover:-translate-x-0.5 focus:outline-none"}]]])])))
 
-(defn tree-table 
+(defn tree-table
   "Renders `rows` of data in a table `[[col1 col2] [col1 col2]]`. 
    If the row is `(expandable-row? row)` then it will render a caret
    to toggle the `(expand-row row)` function and step down a level in the
    tree. `expand-row` should return a new sequence of rows."
-  [{:keys [level caption head-row rows expandable-row? expand-row render-col full-width? table-id-acc] 
+  [{:keys [level caption head-row rows expandable-row? expand-row render-col full-width? table-id-acc]
     :as props}]
   (let [level (or level 0)
         render-col (or render-col str)
