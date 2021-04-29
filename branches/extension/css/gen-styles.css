@@ -781,6 +781,10 @@ video {
   width: 100%;
 }
 
+.z-10 {
+  z-index: 10;
+}
+
 .transform {
   --tw-translate-x: 0;
   --tw-translate-y: 0;
