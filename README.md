@@ -53,7 +53,7 @@ The first one you only have access to via postMessage to the window. You also ge
 - Chrome panel is available by opening up the chrome console inside of _Datalog DB_ panel tab
 
 
-(Fig: 1) - To view the background page go `chrome://extensions/` and click here:
+(Fig: 1) - To view the background page go to `chrome://extensions/` and click here:
 
 ![Datalog Extension background page](docs/datalog-extension.jpg)
 
