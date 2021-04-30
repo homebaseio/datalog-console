@@ -4,27 +4,6 @@
 
 (declare tree-table)
 
-(def tree-table-counter (atom 0))
-
-;; TODO:
-;; Refactor to remove entity specific code into entity namespace
-
-(defn subnest? [current-nest other-nest]
-  (let [[current-c other-c] (map count [current-nest other-nest])]
-    (if (< other-c current-c)
-      true
-      (let [subvec? (= (subvec other-nest 0 current-c)
-                       current-nest)]
-        subvec?))))
-
-(defn event-modifiers
-  "Given a keydown event, return the modifier keys that were being held."
-  [e]
-  (into [] (filter identity [(when (.-shiftKey e) "shift")
-                             (when (.-altKey e) "alt")
-                             (when (.-ctrlKey e) "ctrl")
-                             (when (.-metaKey e) "meta")])))
-
 (defn table-row [{:keys [level row expandable-row? expand-row render-col full-width? view-state table-id] :as props}]
   (let [open? (r/atom false)]
     (fn []
@@ -43,18 +22,10 @@
                  (if (expandable-row? row)
                    (do (when view-state (reset! open? (contains? @view-state row-id)))
                        [:button {:class "pr-1 focus:outline-none"
-                                 :on-click (fn [e]
+                                 :on-click (fn []
                                              (when view-state
                                                (if (contains? @view-state row-id)
-                                                 (do
-                                                   (when (contains? (set (event-modifiers e)) "shift")
-                                                     (let [orig-view-state @view-state
-                                                           xform (comp
-                                                                  (filter #(< level (:level %)))
-                                                                  (filter #(subnest? table-id (:table-id %))))
-                                                           new-view-state (clojure.set/difference orig-view-state (into #{} xform orig-view-state))]
-                                                       (reset! view-state new-view-state))) ; this collapses all nested entities
-                                                   (swap! view-state disj row-id))
+                                                 (swap! view-state disj row-id)
                                                  (swap! view-state conj row-id)))
                                              (reset! open? (not @open?)))}
                         (if @open? "▼" "▶")])
@@ -88,7 +59,7 @@
    If the row is `(expandable-row? row)` then it will render a caret
    to toggle the `(expand-row row)` function and step down a level in the
    tree. `expand-row` should return a new sequence of rows."
-  [{:keys [level caption head-row rows expandable-row? expand-row render-col full-width? table-id-acc]
+  [{:keys [level caption head-row rows render-col table-id-acc]
     :as props}]
   (let [level (or level 0)
         render-col (or render-col str)

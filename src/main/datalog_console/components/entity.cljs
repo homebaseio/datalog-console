@@ -8,9 +8,9 @@
 (defn entity? [v]
   (try
     (not (nil? (:db/id v)))
-    (catch js/Error e false)))
+    (catch js/Error _e false)))
 
-(defn expandable-row? [[a v]]
+(defn expandable-row? [[_a v]]
   (if (set? v)
     (entity? (first v))
     (entity? v)))
@@ -51,7 +51,7 @@
     :else (str col)))
 
 
-(def rerender (atom 0))
+(def rerender (atom 0))  ; This is a hack and ideally we find a way to eliminate the use of this
 
 (defn entity []
   (let [lookup (r/atom "")
