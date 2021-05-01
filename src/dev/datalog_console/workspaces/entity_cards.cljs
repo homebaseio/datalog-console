@@ -45,21 +45,3 @@
   (ct.react/react-card
    (r/as-element [c.entity/entity conn])))
 
-
-
-(comment
-  ;; repl code
-  
-  
-  (d/transact! conn [{:db/id 1
-                      :name "A"
-                      :description "less text"}])
-  
-  (d/pull @conn [:name :description] 1)
-  
-
-
-   ;; format blocker
-  )
-
-
