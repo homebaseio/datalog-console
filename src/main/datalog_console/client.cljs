@@ -32,17 +32,21 @@
 
   
 (defn root []
-  [:div {:class "relative font-sans text-xs h-screen w-full flex flex-row"}
-   [:div {:class "w-80 border-r stack-small pt-2"}
-    [:h2 {:class "pl-1 text-xl border-b flex center"} "Schema Viewer"]
-    [c.schema/schema @rconn]]
-   [:div {:class "flex-auto stack-small"}
-    [:h2 {:class "px-1 text-xl border-b pt-2"} "Entity Inspector"]
-    [c.entity/entity @rconn]]
-   [:button
-    {:class "absolute top-2 right-1 py-1 px-2 rounded bg-gray-200 border shadow-hard btn-border"
-     :on-click #(post-message devtool-port ::request-whole-database-as-string {})}
-    "Refresh database"]])
+  (let [loaded-db? (r/atom false)]
+    (fn []
+      [:div {:class "relative font-sans text-xs h-screen w-full flex flex-row"}
+       [:div {:class "w-80 border-r stack-small pt-2"}
+        [:h2 {:class "pl-1 text-xl border-b flex center"} "Schema Viewer"]
+        [c.schema/schema @rconn]]
+       [:div {:class "flex-auto stack-small"}
+        [:h2 {:class "px-1 text-xl border-b pt-2"} "Entity Inspector"]
+        [c.entity/entity @rconn]]
+       [:button
+        {:class "absolute top-2 right-1 py-1 px-2 rounded bg-gray-200 border shadow-hard btn-border"
+         :on-click (fn []
+                     (when-not @loaded-db? (reset! loaded-db? true))
+                     (post-message devtool-port ::request-whole-database-as-string {}))}
+        (if @loaded-db? "Refresh database" "Load database")]])))
 
 (defn mount! []
   (rdom/render [root] (js/document.getElementById "root")))
