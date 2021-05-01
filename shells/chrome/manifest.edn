@@ -8,14 +8,13 @@
                            "128" "images/default/icon-128.png"}
  :shadow/outputs           {:content-script
                             {:chrome/options {:matches ["<all_urls>"]
-                                              :run_at  "document_end" #_"document_idle"}
+                                              :run_at  "document_idle"}
                              :entries        [datalog-console.chrome.extension.content-script.main]
-                             ;;:init-fn        datalog-console.chrome.extension.content-script.main/init
+
                              }
 
                             :background
                             {:chrome/options {:persistent false}
-                             ;:init-fn        datalog-console.chrome.extension.background.main/init}
                              :entries        [datalog-console.chrome.extension.background.main]}
                             }
 
