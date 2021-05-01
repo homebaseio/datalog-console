@@ -1,0 +1,41 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.shadow-hard {
+  box-shadow: 2px 2px 0px #2d3748;
+  transform: translate(-2px, -2px);
+  transition: 350ms;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: rgba(0,0,0,0);
+}
+
+.btn-border {
+  border-color: #2d3748;
+  border-style: solid;
+  border-width: 0.1px;
+}
+
+@media (any-hover: hover) {
+  .shadow-hard:hover{
+    transform: translate(0px, 0px);
+    box-shadow: 0px 0px 0px #2d3748;
+    transition: 100ms;
+  }
+  }
+
+
+  /* Vertical Spacing */
+.stack-small > * + * {
+  margin-top: 0.5rem;
+}
+
+.stack-large > * + * {
+  margin-top: 1rem;
+}
+
+.stack-xl > * + * {
+  margin-top: 1.5rem;
+}
+
