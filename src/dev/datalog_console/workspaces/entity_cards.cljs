@@ -4,6 +4,7 @@
             [nubank.workspaces.card-types.react :as ct.react]
             [reagent.core :as r]
             [datascript.core :as d]
+            [datalog-console.components.entity-scanner :as c.entity-scanner]
             [datalog-console.components.entity :as c.entity]))
 
 (def conn
@@ -44,4 +45,10 @@
    ::wsm/node-props {:style {:overflow "hidden" :padding 0}}}
   (ct.react/react-card
    (r/as-element [c.entity/entity conn])))
+
+(ws/defcard entity-card-v1
+  {::wsm/align {:flex 1}
+   ::wsm/node-props {:style {:overflow "hidden" :padding 0}}}
+  (ct.react/react-card
+   (r/as-element [c.entity-scanner/entity-scan conn])))
 
