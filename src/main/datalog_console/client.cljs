@@ -33,14 +33,16 @@
   
 (defn root []
   [:div {:class "relative font-sans text-xs h-screen w-full flex flex-row"}
-   [:button
-    {:class "[ z-10 p-2 absolute top-5 right-5 bg-green-700 rounded solid font-bold text-white border-2 border-black] [ hover:bg-white hover:text-green-700 ]"
-     :on-click #(post-message devtool-port ::request-whole-database-as-string {})}
-    "Refresh database"]
-   [:div {:class "w-80 border-r"}
+   [:div {:class "w-80 border-r stack-small pt-2"}
+    [:h2 {:class "pl-1 text-xl border-b flex center"} "Schema Viewer"]
     [c.schema/schema @rconn]]
-   [:div {:class "flex-auto"}
-    [c.entity/entity @rconn]]])
+   [:div {:class "flex-auto stack-small"}
+    [:h2 {:class "px-1 text-xl border-b pt-2"} "Entity Inspector"]
+    [c.entity/entity @rconn]]
+   [:button
+    {:class "absolute top-2 right-1 py-1 px-2 rounded bg-gray-200 border shadow-hard btn-border"
+     :on-click #(post-message devtool-port ::request-whole-database-as-string {})}
+    "Refresh database"]])
 
 (defn mount! []
   (rdom/render [root] (js/document.getElementById "root")))

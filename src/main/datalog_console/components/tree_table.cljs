@@ -66,7 +66,7 @@
         props (merge props {:level level :render-col render-col})]
     [:table {:class "table-auto w-full"}
      (when caption
-       [:caption {:class (if (= 0 level) "px-1 text-left" "sr-only")}
+       [:caption {:class (if true #_(= 0 level) "px-1 text-left bg-red-500 sr-only" "sr-only hidden")}
         caption])
      [:thead {:class (if (= 0 level) "" "sr-only")}
       [:tr {:class "pl-1 font-bold text-left"}

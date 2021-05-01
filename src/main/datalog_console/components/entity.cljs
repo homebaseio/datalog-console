@@ -59,7 +59,7 @@
     (fn [conn]
       (let [entity (d/entity @conn (cljs.reader/read-string @lookup))
             _ (swap! rerender inc)]
-        [:div {:class "w-full h-full overflow-auto pb-5"}
+        [:div {:class "w-full h-full overflow-auto pb-5 stack-small"}
          [:form {:class "flex items-end"
                  :on-submit
                  (fn [e]
@@ -67,14 +67,14 @@
                    (let [current-lookup (goog.object/getValueByKeys e #js ["target" "elements" "lookup" "value"])]
                      (when-not (= @lookup current-lookup) (reset! view-state #{}))
                      (reset! lookup current-lookup)))}
-          [:label {:class "block pt-1 pl-1"}
+          [:label {:class "block pl-1"}
            [:p {:class "font-bold"} "Entity lookup"]
            [:input {:type "text"
                     :name "lookup"
                     :placeholder "id or [:uniq-attr1 \"v1\" ...]"
                     :class "border py-1 px-2 rounded w-56"}]]
           [:button {:type "submit"
-                    :class "ml-1 py-1 px-2 rounded bg-gray-200 border"}
+                    :class "ml-1 py-1 px-2 rounded bg-gray-200 border shadow-hard btn-border"}
            "Get entity"]]
          (when entity
            ^{:key @rerender}
