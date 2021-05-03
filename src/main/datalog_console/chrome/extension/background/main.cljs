@@ -1,67 +1,85 @@
 (ns datalog-console.chrome.extension.background.main
-  (:require [goog.object :as gobj]))
+  (:require [goog.object :as gobj]
+            [cljs-bean.core :refer [->clj ->js]]))
 
 
 (defonce tools-conns* (atom {}))
 (defonce remote-conns* (atom {}))
 
+(defn set-icon-and-popup [tab-id]
+  (js/chrome.browserAction.setIcon
+   (->js {:tabId tab-id
+          :path  {"16"  "images/active/icon-16.png"
+                      "32"  "images/active/icon-16.png"
+                      "48"  "images/active/icon-16.png"
+                      "128" "images/active/icon-16.png"}}))
+  (js/chrome.browserAction.setPopup
+   (->js {:tabId tab-id
+          :popup "popups/enabled.html"})))
+
+
+
+;; Message handlers
 
 (defn handle-devtool-message [devtool-port message _port]
-  (let [tab-id (gobj/get message "tab-id")]
+  (let [msg (->clj message)
+        tab-id (:tab-id msg)]
     (cond
-      (= "init" (gobj/get message "name"))
+      (= "datalog-console.client/init" (:name msg))
       (swap! tools-conns* assoc tab-id devtool-port)
 
       ;; send message to content-script
-      (gobj/getValueByKeys message "devtool-message")
+      (contains? msg :datalog-console.client/devtool-message)
       (.postMessage (get @remote-conns* tab-id) message))))
 
 
-(defn set-icon-and-popup [tab-id]
-  (js/chrome.browserAction.setIcon
-   #js {:tabId tab-id
-        :path  #js {"16"  "images/active/icon-16.png"
-                    "32"  "images/active/icon-16.png"
-                    "48"  "images/active/icon-16.png"
-                    "128" "images/active/icon-16.png"}})
-  (js/chrome.browserAction.setPopup
-   #js {:tabId tab-id
-        :popup "popups/enabled.html"}))
-
-
 (defn handle-remote-message [_remote-port message port]
-  (let [tab-id (gobj/getValueByKeys port "sender" "tab" "id")]
+  (let [tab-id (gobj/getValueByKeys port "sender" "tab" "id")
+        msg (->clj message)]
     (cond
       ; send message to devtool
-      (gobj/getValueByKeys message "datalog-remote-message")
+      (:datalog-remote-message msg)
       (.postMessage (get @tools-conns* tab-id) message)
 
       ; set icon and popup
-      (gobj/getValueByKeys message "datalog-db-detected")
+      (:datalog-console.remote/db-detected msg)
       (set-icon-and-popup tab-id))))
+
+
+;; Listeners
 
 (js/chrome.runtime.onConnect.addListener
  (fn [port]
-   (case (gobj/get port "name")
+   (let [remove-listener (fn [port listener]
+                           (when-let [msg (gobj/get port "onMessage")]
+                             (.removeListener msg listener)))]
+     
+     (case (gobj/get port "name")
 
-     "content-script"
-     (let [listener (partial handle-remote-message port)
-           tab-id   (gobj/getValueByKeys port "sender" "tab" "id")]
+       "content-script-port"
+       (let [listener (partial handle-remote-message port)
+             tab-id   (gobj/getValueByKeys port "sender" "tab" "id")
+             _        (swap! remote-conns* assoc tab-id port)]
 
-       (swap! remote-conns* assoc tab-id port)
-
-       (.addListener (gobj/get port "onMessage") listener)
-       #_(.addListener (gobj/get port "onDisconnet")
+         (.addListener (gobj/get port "onMessage") listener)
+         (.addListener (gobj/get port "onDisconnect")
                        (fn [port]
-                         (.removeListener  (gobj/get port "onMessage") listener))))
+                         (remove-listener port listener)
+                         (swap! remote-conns* dissoc tab-id))))
 
-     "devtool"
-     (let [listener (partial handle-devtool-message port)]
+       "datalog-console.client/devtool-port"
+       (let [listener (partial handle-devtool-message port)]
 
-       (.addListener (gobj/get port "onMessage") listener)
-       #_(.addListener (gobj/get port "onDisconnet")
+         (.addListener (gobj/get port "onMessage") listener)
+         (.addListener (gobj/get port "onDisconnect")
                        (fn [port]
-                         (.removeListener  (gobj/get port "onMessage") listener))))
+                         (remove-listener port listener)
+                         (when-let [port-key (->> @tools-conns*
+                                                (keep (fn [[k v]] (when (= v port) k)))
+                                                (first))]
+                           (swap! tools-conns* dissoc port-key)))))
 
 
-     (js/console.log "Ignoring connection:" (gobj/get port "name")))))
+       nil))))
+
+

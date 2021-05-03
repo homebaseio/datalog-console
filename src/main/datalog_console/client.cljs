@@ -5,7 +5,8 @@
             [datalog-console.components.entity :as c.entity]
             [datascript.core :as d]
             [goog.object :as gobj]
-            [cljs.reader]))
+            [cljs.reader]
+            [cljs-bean.core :refer [->js]]))
 
 
 
@@ -13,13 +14,12 @@
 
 (def current-tab-id js/chrome.devtools.inspectedWindow.tabId)
 
-(def create-port #(js/chrome.runtime.connect #js {:name %}))
-(def devtool-port (create-port "devtool"))
+(def create-port #(js/chrome.runtime.connect (->js {:name %})))
+(def devtool-port (create-port ::devtool-port))
 
 (defn post-message [port type data]
-  (.postMessage port #js {:devtool-message (pr-str {:type type :data data :timestamp (js/Date.)})
-                          :tab-id        current-tab-id}))
-
+  (.postMessage port (->js {::devtool-message (pr-str {:type type :data data :timestamp (js/Date.)})
+                            :tab-id        current-tab-id})))
 
 
 (let [port devtool-port]
@@ -28,7 +28,7 @@
                   (when-let [db-str (gobj/getValueByKeys msg "datalog-remote-message")]
                     (reset! rconn (d/conn-from-db (cljs.reader/read-string db-str))))))
 
-  (.postMessage port #js {:name "init" :tab-id current-tab-id}))
+  (.postMessage port (->js {:name ::init :tab-id current-tab-id})))
 
   
 (defn root []
