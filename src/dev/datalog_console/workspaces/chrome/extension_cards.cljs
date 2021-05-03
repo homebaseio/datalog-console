@@ -6,10 +6,10 @@
             [datalog-console.workspaces.entity-cards :refer [conn]]))
 
 
-
-
-
 (defn enable-remote-database-inspection []
+  ;; TODO: consider passing in a map to allow passing in extra information without creating breaking changes.
+  ;; One example could be passing in an atom containing a register of the databases.
+  ;; We could watch this atom and based on databases being registered or de-registered post a message of the database existance.
   (js/document.documentElement.setAttribute "__datalog-inspect-remote-installed__" true)
   (.addEventListener js/window "message"
                      (fn [event]
@@ -22,12 +22,12 @@
 
                              nil))))))
 
+
 (enable-remote-database-inspection)
 
 
 (defn element [name props & children]
   (apply js/React.createElement name (clj->js props) children))
-
 
 
 (ws/defcard chrome-extension-card
