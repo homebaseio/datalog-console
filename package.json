@@ -9,7 +9,7 @@
   "private": false,
   "scripts": {
     "dev": "yarn dev-chrome",
-    "dev-chrome": "shadow-cljs watch chrome-devtool chrome workspaces",
+    "dev-chrome": "shadow-cljs watch chrome-devtool chrome --config-merge '{:compiler-options {:source-map-inline true}}' workspaces",
     "repl-background": "shadow-cljs cljs-repl chrome",
     "repl-panel": "shadow-cljs cljs-repl chrome-devtool",
     "build:tailwind:dev": "postcss public/css/styles.css -o public/css/gen-styles.css; postcss public/css/styles.css -o shells/chrome/css/gen-styles.css",

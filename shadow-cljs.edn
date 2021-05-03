@@ -14,10 +14,7 @@
           
           :chrome {:target :chrome-extension
                    :compiler-options {:closure-output-charset "US-ASCII"
-                                      :externs ["datascript/externs.js"]
-                                      ;; source-map-inline is only supported in chrome-extension
-                                      ;; IMPORTANT: should only use this while developing
-                                      :source-map-inline true}
+                                      :externs ["datascript/externs.js"]}
                    :extension-dir "shells/chrome"
                    :devtools {:devtools-url "http://localhost:9630"}}
           
