@@ -55,9 +55,21 @@ The first one you only have access to via postMessage to the window. You also ge
 
 (Fig: 1) - To view the background page go to `chrome://extensions/` and click here:
 
-![Datalog Extension background page](docs/datalog-extension.jpg)
+![Datalog Chrome Extension background page](docs/chrome-extension.jpg)
 
 
+## Load the dev extension into Firefox
+
+1. Go to `about:debugging#/runtime/this-firefox`
+2. Click **Load Temporary Add-on...** towards the top right
+3. Select any file in `your-file-path-to/datalog_console/shells/chrome`
+
+[Refer to runtime evironments](#runtime-environments) to find where code is executed.
+
+
+(Fig: 2) - To view the background page go to `about:debugging#/runtime/this-firefox` and click here:
+
+![Datalog Firefox Extension background page](docs/firefox-extension.png)
 
 
 ### Quirks
