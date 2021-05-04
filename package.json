@@ -18,7 +18,8 @@
     "dev-workspaces": "shadow-cljs watch workspaces",
     "build:workspaces": "shadow-cljs release workspaces",
     "build:chrome": "rm shells/chrome/manifest.json ; rm -rf shells/chrome/out ; shadow-cljs release chrome chrome-devtool",
-    "build": "yarn build:tailwind ; yarn build:workspaces ; yarn build:chrome"
+    "build": "yarn build:tailwind ; yarn build:workspaces ; yarn build:chrome",
+    "precleanstart": "node clean.js"
   },
   "devDependencies": {
     "autoprefixer": "^10.2.5",
