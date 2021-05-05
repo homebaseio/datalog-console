@@ -51,41 +51,32 @@
     :else (str col)))
 
 
-(def rerender (atom 0))  ; This is a hack and ideally we find a way to eliminate the use of this
 
 (defn entity []
-  (let [lookup (r/atom "")
-        view-state (r/atom #{})]
+  (let [lookup (r/atom "")]
     (fn [conn]
-      (let [entity (d/entity @conn (cljs.reader/read-string @lookup))
-            _ (swap! rerender inc)]
-        [:div {:class "w-full h-full overflow-auto pb-5 stack-small"}
+      (let [entity (d/entity @conn (cljs.reader/read-string @lookup))]
+        [:div {:class "w-full h-full overflow-auto pb-5"}
          [:form {:class "flex items-end"
                  :on-submit
                  (fn [e]
                    (.preventDefault e)
-                   (let [current-lookup (goog.object/getValueByKeys e #js ["target" "elements" "lookup" "value"])]
-                     (when-not (= @lookup current-lookup) (reset! view-state #{}))
-                     (reset! lookup current-lookup)))}
-          [:label {:class "block pl-1"}
+                   (reset! lookup (goog.object/getValueByKeys e #js ["target" "elements" "lookup" "value"])))}
+          [:label {:class "block pt-1 pl-1"}
            [:p {:class "font-bold"} "Entity lookup"]
            [:input {:type "text"
                     :name "lookup"
                     :placeholder "id or [:uniq-attr1 \"v1\" ...]"
                     :class "border py-1 px-2 rounded w-56"}]]
           [:button {:type "submit"
-                    :class "ml-1 py-1 px-2 rounded bg-gray-200 border shadow-hard btn-border"}
+                    :class "ml-1 py-1 px-2 rounded bg-gray-200 border"}
            "Get entity"]]
          (when entity
-           ^{:key @rerender}
            [c.tree-table/tree-table
             {:caption (str "entity " (select-keys entity [:db/id]))
+             :conn conn
              :head-row ["Attribute", "Value"]
              :rows (entity->rows entity)
              :expandable-row? expandable-row?
              :expand-row expand-row
-             :render-col render-col
-             :table-id @lookup
-             :view-state view-state}])]))))
-
-
+             :render-col render-col}])]))))
