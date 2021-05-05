@@ -9,25 +9,25 @@
     (fn [{:keys [level row expandable-row? expand-row render-col full-width? _conn] :as props}]
       [:<>
        [:tr {:class "odd:bg-gray-100"}
-        (for [[i col] (map-indexed vector row)]
-          ^{:key (str {:level level :col col})}
-          [:<>
-           (if (= 0 i)
-             [:td {:title (str col)
-                   :style {:padding-left (str (+ 0.25 level) "rem")
-                           :max-width "16rem"}
-                   :class "pr-1 box-content truncate"}
-              (if (expandable-row? row)
-                [:button {:class "pr-1 focus:outline-none"
-                          :on-click #(reset! open? (not @open?))}
-                 (if @open? "▼" "▶")]
-                [:span {:class "pr-1 invisible"} "▶"])
-              (render-col col)]
-             [:td {:title (str col)
-                   :style {:max-width 0
-                           :min-width (when-not full-width? 100)}
-                   :class (if full-width? "pl-3 w-full" "pl-3 truncate w-full")}
-              (render-col col)])])]
+        (doall (for [[i col] (map-indexed vector row)]
+                 ^{:key (str {:level level :col col})}
+                 [:<>
+                  (if (= 0 i)
+                    [:td {:title (str col)
+                          :style {:padding-left (str (+ 0.25 level) "rem")
+                                  :max-width "16rem"}
+                          :class "pr-1 box-content truncate"}
+                     (if (expandable-row? row)
+                       [:button {:class "pr-1 focus:outline-none"
+                                 :on-click #(reset! open? (not @open?))}
+                        (if @open? "▼" "▶")]
+                       [:span {:class "pr-1 invisible"} "▶"])
+                     (render-col col)]
+                    [:td {:title (str col)
+                          :style {:max-width 0
+                                  :min-width (when-not full-width? 100)}
+                          :class (if full-width? "pl-3 w-full" "pl-3 truncate w-full")}
+                     (render-col col)])]))]
        (when @open?
          [:tr
           [:td {:col-span (count row) :class "p-0 relative"}

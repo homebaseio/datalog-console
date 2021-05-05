@@ -5,16 +5,16 @@
             [datalog-console.components.entity :as c.entity]
             [datascript.core :as d]
             [goog.object :as gobj]
-            [cljs.reader]
-            [cljs-bean.core :refer [->js]]))
+            [cljs.reader]))
 
 
 
 (def rconn (r/atom (d/create-conn {})))
+(def entity-lookup-ratom (r/atom ""))
 
 (def current-tab-id js/chrome.devtools.inspectedWindow.tabId)
 
-(def create-port #(js/chrome.runtime.connect (->js {:name %})))
+(def create-port #(js/chrome.runtime.connect #js {:name %}))
 (def devtool-port (create-port ":datalog-console.client/devtool-port"))
 
 (defn post-message [port type data]

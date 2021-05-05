@@ -7,6 +7,8 @@
             [datalog-console.components.entity-scanner :as c.entity-scanner]
             [datalog-console.components.entity :as c.entity]))
 
+(def entity-lookup-ratom (r/atom ""))
+
 (def conn
   (let [conn (d/create-conn
               {:name {:db/unique :db.unique/identity}
@@ -44,11 +46,11 @@
   {::wsm/align {:flex 1}
    ::wsm/node-props {:style {:overflow "hidden" :padding 0}}}
   (ct.react/react-card
-   (r/as-element [c.entity/entity conn])))
+   (r/as-element [c.entity/entity conn entity-lookup-ratom])))
 
-(ws/defcard entity-card-v1
+(ws/defcard entity-scanner
   {::wsm/align {:flex 1}
    ::wsm/node-props {:style {:overflow "hidden" :padding 0}}}
   (ct.react/react-card
-   (r/as-element [c.entity-scanner/entity-scan conn])))
+   (r/as-element [c.entity-scanner/entity-scan conn entity-lookup-ratom])))
 

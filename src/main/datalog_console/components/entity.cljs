@@ -52,31 +52,38 @@
 
 
 
-(defn entity []
+(defn lookup-form []
   (let [lookup (r/atom "")]
-    (fn [conn]
-      (let [entity (d/entity @conn (cljs.reader/read-string @lookup))]
-        [:div {:class "w-full h-full overflow-auto pb-5"}
-         [:form {:class "flex items-end"
-                 :on-submit
-                 (fn [e]
-                   (.preventDefault e)
-                   (reset! lookup (goog.object/getValueByKeys e #js ["target" "elements" "lookup" "value"])))}
-          [:label {:class "block pt-1 pl-1"}
-           [:p {:class "font-bold"} "Entity lookup"]
-           [:input {:type "text"
-                    :name "lookup"
-                    :placeholder "id or [:uniq-attr1 \"v1\" ...]"
-                    :class "border py-1 px-2 rounded w-56"}]]
-          [:button {:type "submit"
-                    :class "ml-1 py-1 px-2 rounded bg-gray-200 border"}
-           "Get entity"]]
-         (when entity
-           [c.tree-table/tree-table
-            {:caption (str "entity " (select-keys entity [:db/id]))
-             :conn conn
-             :head-row ["Attribute", "Value"]
-             :rows (entity->rows entity)
-             :expandable-row? expandable-row?
-             :expand-row expand-row
-             :render-col render-col}])]))))
+    (fn [on-submit entity-lookup-ratom]
+      (when (= @lookup @entity-lookup-ratom) (js/console.log "it's same!" @lookup) )
+      [:form {:class "flex items-end"
+              :on-submit
+              (fn [e]
+                (.preventDefault e)
+                (on-submit @lookup))}
+       [:label {:class "block pl-1"}
+        [:p {:class "font-bold"} "Entity lookup"]
+        [:input {:type "text"
+                 :name "lookup"
+                 :value @lookup
+                 :on-change (fn [e] (reset! lookup (goog.object/getValueByKeys e #js ["target" "value"])))
+                 :placeholder "id or [:uniq-attr1 \"v1\" ...]"
+                 :class "border py-1 px-2 rounded w-56"}]]
+       [:button {:type "submit"
+                 :class "ml-1 py-1 px-2 rounded bg-gray-200 border shadow-hard btn-border"}
+        "Get entity"]])))
+
+(defn entity []
+  (fn [conn entity-lookup-ratom]
+    (let [entity (d/entity @conn (cljs.reader/read-string @entity-lookup-ratom))]
+      [:div {:class "w-full h-full overflow-auto pb-5"}
+       [lookup-form #(reset! entity-lookup-ratom %) entity-lookup-ratom]
+       (when entity
+         [c.tree-table/tree-table
+          {:caption (str "entity " (select-keys entity [:db/id]))
+           :conn conn
+           :head-row ["Attribute", "Value"]
+           :rows (entity->rows entity)
+           :expandable-row? expandable-row?
+           :expand-row expand-row
+           :render-col render-col}])])))
