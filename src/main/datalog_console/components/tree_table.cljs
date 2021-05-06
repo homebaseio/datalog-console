@@ -37,7 +37,8 @@
                           :rows (expand-row row)})]
            [:button {:title (str "Collapse  " (pr-str row))
                      :on-click #(reset! open? false)
-                     :class "absolute h-full top-0 left-2.5 border-gray-300 border-l transform hover:border-l-6 hover:-translate-x-1 focus:outline-none"}]]])])))
+                     :style {:margin-left (str (+ 0.4 level) "rem")}
+                     :class "top-0 bottom-0 absolute transition-all duration-100 ease-in border-r border-gray-300 hover:border-gray-400 w-1 hover:bg-gray-400"}]]])]))) ; border-gray-300 border-l hover:translate-x-1 hover:border-l-6 ;top-0 left-2.5 absolute h-full border-gray-300 border-l transform hover:border-l-6 hover:-translate-x-1 focus:outline-none
 
 (defn tree-table
   "Renders `rows` of data in a table `[[col1 col2] [col1 col2]]`. 
@@ -49,7 +50,7 @@
   (let [level (or level 0)
         render-col (or render-col str)
         props (merge props {:level level :render-col render-col})]
-    [:table {:class "table-auto w-full"}
+    [:table {:class "table-auto w-full relative"}
      (when caption
        [:caption {:class (if (= 0 level) "px-1 text-left" "sr-only")}
         caption])

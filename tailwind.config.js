@@ -28,6 +28,7 @@ module.exports = {
     extend: {
       backgroundColor: ['even','odd'],
       borderWidth: ['hover'],
+      width: ["responsive", "hover", "focus"]
     }
   },
   plugins: [
