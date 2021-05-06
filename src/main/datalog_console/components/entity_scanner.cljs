@@ -18,6 +18,6 @@
      (for [[id] (entity-agg conn)]
        ^{:key id}
        [:li
-        {:class "truncate odd:bg-gray-100"
+        {:class "truncate odd:bg-gray-100 cursor-pointer"
          :on-click #(reset! entity-lookup-ratom (str id))}
         (str (into {:db/id id} (d/entity @conn id)))])]))
