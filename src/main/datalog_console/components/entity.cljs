@@ -53,14 +53,18 @@
 
 
 (defn lookup-form []
-  (let [lookup (r/atom "")]
-    (fn [on-submit entity-lookup-ratom]
-      (when (= @lookup @entity-lookup-ratom) (js/console.log "it's same!" @lookup) )
+  (let [lookup (r/atom "")
+        entity-lookup-ratom-cache (r/atom "")]
+    (fn [entity-lookup-ratom]
+      (when-not (= @entity-lookup-ratom @entity-lookup-ratom-cache)
+        (reset! entity-lookup-ratom-cache @entity-lookup-ratom)
+        (reset! lookup @entity-lookup-ratom))
       [:form {:class "flex items-end"
               :on-submit
               (fn [e]
                 (.preventDefault e)
-                (on-submit @lookup))}
+                (reset! entity-lookup-ratom @lookup)
+                #_(on-submit @lookup))}
        [:label {:class "block pl-1"}
         [:p {:class "font-bold"} "Entity lookup"]
         [:input {:type "text"
@@ -77,7 +81,7 @@
   (fn [conn entity-lookup-ratom]
     (let [entity (d/entity @conn (cljs.reader/read-string @entity-lookup-ratom))]
       [:div {:class "w-full h-full overflow-auto pb-5"}
-       [lookup-form #(reset! entity-lookup-ratom %) entity-lookup-ratom]
+       [lookup-form entity-lookup-ratom #_#(reset! entity-lookup-ratom %)]
        (when entity
          [c.tree-table/tree-table
           {:caption (str "entity " (select-keys entity [:db/id]))
