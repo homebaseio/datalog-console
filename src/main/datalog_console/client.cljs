@@ -5,8 +5,7 @@
             [datalog-console.components.entity :as c.entity]
             [datascript.core :as d]
             [goog.object :as gobj]
-            [cljs.reader]
-            [cljs-bean.core :refer [->js]]))
+            [cljs.reader]))
 
 
 
@@ -14,7 +13,7 @@
 
 (def current-tab-id js/chrome.devtools.inspectedWindow.tabId)
 
-(def create-port #(js/chrome.runtime.connect (->js {:name %})))
+(def create-port #(js/chrome.runtime.connect #js {:name %}))
 (def devtool-port (create-port ":datalog-console.client/devtool-port"))
 
 (defn post-message [port type data]
@@ -34,7 +33,7 @@
 (defn root []
   (let [loaded-db? (r/atom false)]
     (fn []
-      [:div {:class "relative font-sans text-xs h-screen w-full flex flex-row"}
+      [:div {:class "relative text-xs h-screen w-full flex flex-row"}
        [:div {:class "w-80 border-r stack-small pt-2"}
         [:h2 {:class "pl-1 text-xl border-b flex center"} "Schema Viewer"]
         [c.schema/schema @rconn]]
