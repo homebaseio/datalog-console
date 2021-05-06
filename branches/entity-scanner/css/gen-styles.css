@@ -534,11 +534,6 @@ video {
   background-color: rgba(229, 231, 235, var(--tw-bg-opacity));
 }
 
-.bg-red-500 {
-  --tw-bg-opacity: 1;
-  background-color: rgba(239, 68, 68, var(--tw-bg-opacity));
-}
-
 .odd\:bg-gray-100:nth-child(odd) {
   --tw-bg-opacity: 1;
   background-color: rgba(243, 244, 246, var(--tw-bg-opacity));
@@ -575,6 +570,10 @@ video {
 
 .box-content {
   box-sizing: content-box;
+}
+
+.cursor-pointer {
+  cursor: pointer;
 }
 
 .block {
@@ -773,12 +772,8 @@ video {
   transform: translateX(var(--tw-translate-x)) translateY(var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
 }
 
-.hover\:-translate-x-0:hover {
-  --tw-translate-x: 0px;
-}
-
-.hover\:-translate-x-0\.5:hover {
-  --tw-translate-x: -0.125rem;
+.hover\:-translate-x-1:hover {
+  --tw-translate-x: -0.25rem;
 }
 
 @-webkit-keyframes spin {
