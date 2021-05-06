@@ -63,8 +63,7 @@
               :on-submit
               (fn [e]
                 (.preventDefault e)
-                (reset! entity-lookup-ratom @lookup)
-                #_(on-submit @lookup))}
+                (reset! entity-lookup-ratom @lookup))}
        [:label {:class "block pl-1"}
         [:p {:class "font-bold"} "Entity lookup"]
         [:input {:type "text"
