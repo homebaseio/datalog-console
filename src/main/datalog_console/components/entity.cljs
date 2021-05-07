@@ -3,6 +3,7 @@
             [reagent.core :as r]
             [cljs.reader]
             [goog.object]
+            [clojure.string :as str]
             [datalog-console.components.tree-table :as c.tree-table]))
 
 (defn entity? [v]
@@ -52,35 +53,71 @@
 
 
 
+(defn entity-lookup-form-validation [conn lookup]
+  ;; We probably want to do a lot more here
+  ;; Such as adding more helpful hints for user input mistakes
+  (when-not (str/blank? lookup) ;skip if empty string
+    (let [lookup (str/trim lookup)
+          seq-str (seq lookup)]
+      (if (and (= "[" (first seq-str))
+               (= "]" (last seq-str)))
+        (let [read-lookup-result (try
+                                   (cljs.reader/read-string lookup)
+                                   (catch js/Error _e {:error "Invalid form input"}))]
+          (if-not (:error read-lookup-result)
+            (let [kw (first read-lookup-result)]
+              (if (keyword? kw)
+                (when-not (contains? (set (keys (filter (fn [[_k v]] (contains? v :db/unique))
+                                                        (:schema @conn))))
+                                     kw)
+                  {:error (str "No unique attribute found for " kw " in schema")})
+                {:error "No keyword provided for unique attribute"}))
+            read-lookup-result))
+        (if (integer? (js/parseInt (first seq-str)))
+          (when-not (every? true? (map integer? (map #(js/parseInt %) lookup))) ;skip if all input is numbers
+            {:error "Input starts as number but there seems to be a mistake with the rest of input"})
+          {:error "No vector provided for unique attribute lookup"})))))
+
+
+
 (defn lookup-form []
   (let [lookup (r/atom "")
-        entity-lookup-ratom-cache (r/atom "")]
-    (fn [entity-lookup-ratom]
+        entity-lookup-ratom-cache (r/atom "")
+        input-error (r/atom nil)]
+    (fn [conn entity-lookup-ratom]
       (when-not (= @entity-lookup-ratom @entity-lookup-ratom-cache)
         (reset! entity-lookup-ratom-cache @entity-lookup-ratom)
+        (reset! input-error nil)
         (reset! lookup @entity-lookup-ratom))
-      [:form {:class "flex items-end"
-              :on-submit
-              (fn [e]
-                (.preventDefault e)
-                (reset! entity-lookup-ratom @lookup))}
-       [:label {:class "block pl-1"}
-        [:p {:class "font-bold"} "Entity lookup"]
-        [:input {:type "text"
-                 :name "lookup"
-                 :value @lookup
-                 :on-change (fn [e] (reset! lookup (goog.object/getValueByKeys e #js ["target" "value"])))
-                 :placeholder "id or [:uniq-attr1 \"v1\" ...]"
-                 :class "border py-1 px-2 rounded w-56"}]]
-       [:button {:type "submit"
-                 :class "ml-1 py-1 px-2 rounded bg-gray-200 border shadow-hard btn-border"}
-        "Get entity"]])))
+      [:div
+       [:form {:class "flex items-end"
+               :on-submit
+               (fn [e]
+                 (.preventDefault e)
+                 (if-let [error (:error (entity-lookup-form-validation conn @lookup))]
+                   (do 
+                     (reset! input-error error))
+                   (reset! entity-lookup-ratom @lookup)))}
+        [:label {:class "block pl-1"}
+         [:p {:class "font-bold"} "Entity lookup"]
+         [:input {:type "text"
+                  :name "lookup"
+                  :value @lookup
+                  :on-change (fn [e] (reset! lookup (goog.object/getValueByKeys e #js ["target" "value"])))
+                  :placeholder "id or [:uniq-attr1 \"v1\" ...]"
+                  :class "border py-1 px-2 rounded w-56"}]]
+        [:button {:type "submit"
+                  :class "ml-1 py-1 px-2 rounded bg-gray-200 border shadow-hard btn-border"}
+         "Get entity"]]
+       (when @input-error
+         [:div {:class "bg-red-300"}
+          [:p @input-error]])])))
 
 (defn entity []
   (fn [conn entity-lookup-ratom]
     (let [entity (d/entity @conn (cljs.reader/read-string @entity-lookup-ratom))]
       [:div {:class "w-full h-full overflow-auto pb-5"}
-       [lookup-form entity-lookup-ratom #_#(reset! entity-lookup-ratom %)]
+       [lookup-form conn entity-lookup-ratom]
        (when entity
          [c.tree-table/tree-table
           {:caption (str "entity " (select-keys entity [:db/id]))
@@ -90,3 +127,5 @@
            :expandable-row? expandable-row?
            :expand-row expand-row
            :render-col render-col}])])))
+
+
