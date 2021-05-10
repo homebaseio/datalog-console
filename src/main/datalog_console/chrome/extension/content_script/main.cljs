@@ -9,7 +9,7 @@
 ;; TODO: Actually check if a database exists. 
 ;; Need to consider if it makes sense to prefetch the database when the application has registered.
 ;; This would create overhead when people are not using the devtool.
-(when (js/document.documentElement.getAttribute "__datalog-inspect-remote-installed__")
+(when (js/document.documentElement.getAttribute ":datalog-console.remote/installed?")
   (.postMessage port #js {":datalog-console.remote/db-detected" true}))
 
 ;; forward devtool message to window
