@@ -14,7 +14,7 @@
 
 (defn entity-scan []
   (fn [conn entity-lookup-ratom]
-    [:ul
+    [:ul {:class "w-full h-full overflow-auto pb-5"}
      (for [[id] (entity-agg conn)]
        ^{:key id}
        [:li
