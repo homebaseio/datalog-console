@@ -14,10 +14,17 @@
 
 (defn entities []
   (fn [conn entity-lookup-ratom]
-    [:ul {:class "w-full h-full overflow-auto pb-5"}
-     (for [[id] (entity-agg conn)]
-       ^{:key id}
-       [:li
-        {:class "truncate odd:bg-gray-100 cursor-pointer"
-         :on-click #(reset! entity-lookup-ratom (str id))}
-        (str (into {:db/id id} (d/entity @conn id)))])]))
+    (let [truncate-long-strings #(map (fn [[k v]]
+                                        {k (if (and (string? v) (< 100 (count v)))
+                                             (str (subs v 0 100) "...")
+                                             v)}) %)]
+      [:ul {:class "w-full h-full overflow-auto pb-5"}
+       (for [[id] (entity-agg conn)]
+         ^{:key id}
+         [:li
+          {:class "odd:bg-gray-100 cursor-pointer min-w-max"
+           :style {:min-width :max-content}
+           :on-click #(reset! entity-lookup-ratom (str id))}
+          (str (into {:db/id id} (truncate-long-strings (d/entity @conn id))))])])))
+
+
