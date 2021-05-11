@@ -16,7 +16,7 @@
                     [:td {:title (str col)
                           :style {:padding-left (str (+ 0.25 level) "rem")
                                   :max-width "16rem"}
-                          :class "pr-1 box-content truncate"}
+                          :class "pr-1 box-content truncate align-top"}
                      (if (expandable-row? row)
                        [:button {:class "pr-1 focus:outline-none"
                                  :on-click #(reset! open? (not @open?))}
@@ -24,13 +24,12 @@
                        [:span {:class "pr-1 invisible"} "▶"])
                      (render-col col)]
                     [:td {:title (str col)
-                          :style {:max-width 0
-                                  :min-width (when-not full-width? 100)}
-                          :class (if full-width? "pl-3 w-full" "pl-3 truncate w-full")}
+                          :class (if full-width? "pl-3 w-full align-top" "pl-3 w-full align-top")} ;truncate
                      (render-col col)])]))]
        (when @open?
          [:tr
-          [:td {:col-span (count row) :class "p-0 relative"}
+          [:td {:col-span (count row) :class "p-0 relative align-top"
+                :style {:min-width :max-content}}
            [tree-table
             (merge props {:level (inc level)
                           :caption nil

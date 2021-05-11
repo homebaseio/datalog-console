@@ -45,10 +45,20 @@
     (set? v) (map-indexed (fn [i vv] [(str a " " i) vv]) v)
     (entity? v) (entity->rows v)))
 
+(defn handle-long-text-col []
+  (let [expanded-text? (r/atom false)]
+    (fn [col]
+      [:span {:class (str "cursor-pointer "(when-not @expanded-text? "block"))
+              :style {:min-width :max-content}
+              :on-click #(reset! expanded-text? (not @expanded-text?))}
+       (if expanded-text? col (str (subs col 0 45) "..."))])))
+
+
 (defn render-col [col]
   (cond
     (set? col) (str "#[" (count col) " item" (when (< 1 (count col)) "s") "]")
     (entity? col) (str (select-keys col [:db/id]))
+    (and (string? col) (< 45 (count col))) [handle-long-text-col col]
     :else (str col)))
 
 
