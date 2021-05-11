@@ -3,7 +3,7 @@
             [reagent.core :as r]
             [datalog-console.components.schema :as c.schema]
             [datalog-console.components.entity :as c.entity]
-            [datalog-console.components.entity-scanner :as c.entity-scanner]
+            [datalog-console.components.entities :as c.entities]
             [datascript.core :as d]
             [goog.object :as gobj]
             [cljs.reader]))
@@ -43,7 +43,7 @@
         [c.schema/schema @rconn]]
        [:div {:class "w-80 flex flex-col flex-1 border-r"}
         [:h2 {:class "px-1 text-xl border-b pt-2"} "Entity Scanner"]
-        [c.entity-scanner/entity-scan @rconn entity-lookup-ratom]]
+        [c.entities/entities @rconn entity-lookup-ratom]]
        [:div {:class "flex flex-col stack-small"
               :style {:flex 2}}
         [:h2 {:class "px-1 text-xl border-b pt-2"} "Entity Inspector"]

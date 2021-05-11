@@ -1,4 +1,4 @@
-(ns datalog-console.components.entity-scanner
+(ns datalog-console.components.entities
   (:require [datascript.core :as d]
             [cljs.reader]
             [goog.object]))
@@ -12,7 +12,7 @@
        (group-by :db/id)))
 
 
-(defn entity-scan []
+(defn entities []
   (fn [conn entity-lookup-ratom]
     [:ul {:class "w-full h-full overflow-auto pb-5"}
      (for [[id] (entity-agg conn)]
