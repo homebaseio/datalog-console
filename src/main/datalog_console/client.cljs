@@ -39,14 +39,14 @@
     (fn []
       [:div {:class "relative text-xs h-full w-full flex flex-row"}
        [:div {:class "w-80 flex flex-col flex-1 border-r stack-small pt-2"}
-        [:h2 {:class "pl-1 text-xl border-b flex center"} "Schema Viewer"]
+        [:h2 {:class "pl-1 text-xl border-b flex center"} "Schema"]
         [c.schema/schema @rconn]]
        [:div {:class "w-80 flex flex-col flex-1 border-r"}
-        [:h2 {:class "px-1 text-xl border-b pt-2"} "Entity Scanner"]
+        [:h2 {:class "px-1 text-xl border-b pt-2"} "Entities"]
         [c.entities/entities @rconn entity-lookup-ratom]]
        [:div {:class "flex flex-col stack-small"
               :style {:flex 2}}
-        [:h2 {:class "px-1 text-xl border-b pt-2"} "Entity Inspector"]
+        [:h2 {:class "px-1 text-xl border-b pt-2"} "Entity"]
         [c.entity/entity @rconn entity-lookup-ratom]]
        [:button
         {:class "absolute top-2 right-1 py-1 px-2 rounded bg-gray-200 border shadow-hard btn-border"
