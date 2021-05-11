@@ -37,15 +37,14 @@
 (defn root []
   (let [loaded-db? (r/atom false)]
     (fn []
-      [:div {:class "relative text-xs h-full w-full flex flex-row"}
-       [:div {:class "w-80 flex flex-col flex-1 border-r stack-small pt-2"}
+      [:div {:class "relative text-xs h-full w-full grid grid-cols-4"}
+       [:div {:class "flex flex-col overflow-auto border-r stack-small pt-2 col-span-1 "}
         [:h2 {:class "pl-1 text-xl border-b flex center"} "Schema"]
         [c.schema/schema @rconn]]
-       [:div {:class "w-80 flex flex-col flex-1 border-r"}
+       [:div {:class "flex flex-col overflow-auto border-r col-span-1 "}
         [:h2 {:class "px-1 text-xl border-b pt-2"} "Entities"]
         [c.entities/entities @rconn entity-lookup-ratom]]
-       [:div {:class "flex flex-col stack-small"
-              :style {:flex 2}}
+       [:div {:class "flex flex-col overflow-auto stack-small col-span-2"}
         [:h2 {:class "px-1 text-xl border-b pt-2"} "Entity"]
         [c.entity/entity @rconn entity-lookup-ratom]]
        [:button

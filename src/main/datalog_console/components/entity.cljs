@@ -48,10 +48,10 @@
 (defn handle-long-text-col []
   (let [expanded-text? (r/atom false)]
     (fn [col]
-      [:span {:class (str "cursor-pointer "(when-not @expanded-text? "block"))
+      [:span {:class (str "cursor-pointer " (when-not @expanded-text? "block"))
               :style {:min-width :max-content}
               :on-click #(reset! expanded-text? (not @expanded-text?))}
-       (if expanded-text? col (str (subs col 0 45) "..."))])))
+       (if @expanded-text? col (str (subs col 0 45) "..."))])))
 
 
 (defn render-col [col]
@@ -97,7 +97,7 @@
 (defn entity []
   (fn [conn entity-lookup-ratom]
     (let [entity (d/entity @conn (cljs.reader/read-string @entity-lookup-ratom))]
-      [:div {:class "w-full h-full overflow-auto pb-5"}
+      [:div {:class "flex flex-col h-full overflow-auto w-full pb-5"}
        [lookup-form conn #(reset! entity-lookup-ratom %)]
        [:div {:class "pt-2"}
         (when entity

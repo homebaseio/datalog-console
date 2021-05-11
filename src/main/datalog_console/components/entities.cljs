@@ -18,12 +18,11 @@
                                         {k (if (and (string? v) (< 100 (count v)))
                                              (str (subs v 0 100) "...")
                                              v)}) %)]
-      [:ul {:class "w-full h-full overflow-auto pb-5"}
+      [:ul {:class "h-full overflow-auto flex flex-col pb-5"}
        (for [[id] (entity-agg conn)]
          ^{:key id}
          [:li
           {:class "odd:bg-gray-100 cursor-pointer min-w-max"
-           :style {:min-width :max-content}
            :on-click #(reset! entity-lookup-ratom (str id))}
           (str (into {:db/id id} (truncate-long-strings (d/entity @conn id))))])])))
 
