@@ -23,6 +23,7 @@
          ^{:key id}
          [:li
           {:class "odd:bg-gray-100 cursor-pointer min-w-max"
+           :title (str (into {:db/id id} (d/entity @conn id)))
            :on-click #(reset! entity-lookup-ratom (str id))}
           (str (into {:db/id id} (truncate-long-strings (d/entity @conn id))))])])))
 
