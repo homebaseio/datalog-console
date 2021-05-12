@@ -55,7 +55,7 @@
           real-schema (coll->schema (:schema db) first last)
           inferred-schema (coll->schema (d/datoms db :eavt) :a #(infer-schema (:v %)))
           merged-schemas (deep-merge inferred-schema real-schema)]
-      [:div {:class "w-full h-full overflow-auto pb-5"}
+      [:div {:class "flex pb-5 w-full"}
        [c.tree-table/tree-table
         {:caption "schema"
          :head-row ["Attribute", "Value"]

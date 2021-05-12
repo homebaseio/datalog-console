@@ -33,22 +33,24 @@
     (.postMessage port #js {:name ":datalog-console.client/init" :tab-id current-tab-id}))
   (catch js/Error _e nil))
 
-  
 (defn root []
   (let [loaded-db? (r/atom false)]
     (fn []
       [:div {:class "relative text-xs h-full w-full grid grid-cols-4"}
-       [:div {:class "flex flex-col overflow-auto border-r stack-small pt-2 col-span-1 "}
+       [:div {:class "flex flex-col border-r pt-2 overflow-hidden col-span-1 "}
         [:h2 {:class "pl-1 text-xl border-b flex center"} "Schema"]
-        [c.schema/schema @rconn]]
-       [:div {:class "flex flex-col overflow-auto border-r col-span-1 "}
+        [:div {:class "overflow-auto h-full w-full"}
+         [c.schema/schema @rconn]]]
+       [:div {:class "flex flex-col border-r overflow-hidden col-span-1 "}
         [:h2 {:class "px-1 text-xl border-b pt-2"} "Entities"]
-        [c.entities/entities @rconn entity-lookup-ratom]]
-       [:div {:class "flex flex-col overflow-auto stack-small col-span-2"}
+        [:div {:class "overflow-auto h-full w-full"}
+         [c.entities/entities @rconn entity-lookup-ratom]]]
+       [:div {:class "flex flex-col overflow-hidden col-span-2"}
         [:h2 {:class "px-1 text-xl border-b pt-2"} "Entity"]
-        [c.entity/entity @rconn entity-lookup-ratom]]
+        [:div {:class "overflow-auto h-full w-full"}
+         [c.entity/entity @rconn entity-lookup-ratom]]]
        [:button
-        {:class "absolute top-2 right-1 py-1 px-2 rounded bg-gray-200 border shadow-hard btn-border"
+        {:class "absolute top-2 right-1 py-1 px-2 rounded bg-gray-200 border"
          :on-click (fn []
                      (when-not @loaded-db? (reset! loaded-db? true))
                      (post-message devtool-port :datalog-console.client/request-whole-database-as-string {}))}

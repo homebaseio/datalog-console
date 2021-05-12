@@ -18,7 +18,7 @@
                                         {k (if (and (string? v) (< 100 (count v)))
                                              (str (subs v 0 100) "...")
                                              v)}) %)]
-      [:ul {:class "h-full overflow-auto flex flex-col pb-5"}
+      [:ul {:class "w-full flex flex-col pb-5"}
        (for [[id] (entity-agg conn)]
          ^{:key id}
          [:li

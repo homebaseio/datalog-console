@@ -42,7 +42,7 @@
 
 (ws/defcard tree-table-card
   {::wsm/align {:flex 1}
-   ::wsm/node-props {:style {:overflow "hidden" :padding 0}}}
+   ::wsm/node-props {:style {:padding 0}}}
   (ct.react/react-card
    (r/as-element
     [:div {:class "w-full h-full overflow-auto pb-5"}

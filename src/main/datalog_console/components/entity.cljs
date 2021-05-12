@@ -45,20 +45,21 @@
     (set? v) (map-indexed (fn [i vv] [(str a " " i) vv]) v)
     (entity? v) (entity->rows v)))
 
-(defn handle-long-text-col []
+(defn string-cell []
   (let [expanded-text? (r/atom false)]
-    (fn [col]
-      [:span {:class (str "cursor-pointer " (when-not @expanded-text? "block"))
-              :style {:min-width :max-content}
-              :on-click #(reset! expanded-text? (not @expanded-text?))}
-       (if @expanded-text? col (str (subs col 0 45) "..."))])))
+    (fn [s]
+      (if (< (count s) 45)
+        [:div s]
+        [:div {:class (str "cursor-pointer " (if-not @expanded-text? "min-w-max" "w-96"))
+                :on-click #(reset! expanded-text? (not @expanded-text?))}
+         (if @expanded-text? s (str (subs s 0 45) "..."))]))))
 
 
 (defn render-col [col]
   (cond
     (set? col) (str "#[" (count col) " item" (when (< 1 (count col)) "s") "]")
     (entity? col) (str (select-keys col [:db/id]))
-    (and (string? col) (< 45 (count col))) [handle-long-text-col col]
+    (string? col) [string-cell col]
     :else (str col)))
 
 
@@ -88,7 +89,7 @@
                   :placeholder "id or [:uniq-attr1 \"v1\" ...]"
                   :class "border py-1 px-2 rounded w-56"}]]
         [:button {:type "submit"
-                  :class "ml-1 py-1 px-2 rounded bg-gray-200 border shadow-hard btn-border"}
+                  :class "ml-1 py-1 px-2 rounded bg-gray-200 border"}
          "Get entity"]]
        (when @input-error
          [:div {:class "bg-red-200 m-4 p-4 rounded"}
@@ -97,7 +98,7 @@
 (defn entity []
   (fn [conn entity-lookup-ratom]
     (let [entity (d/entity @conn (cljs.reader/read-string @entity-lookup-ratom))]
-      [:div {:class "flex flex-col h-full overflow-auto w-full pb-5"}
+      [:div {:class "flex flex-col w-full pb-5"}
        [lookup-form conn #(reset! entity-lookup-ratom %)]
        [:div {:class "pt-2"}
         (when entity
