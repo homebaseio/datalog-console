@@ -1,14 +1,17 @@
 (ns datalog-console.components.entity
   (:require [datascript.core :as d]
             [reagent.core :as r]
+            [cljs.reader]
+            [goog.object]
+            [clojure.string :as str]
             [datalog-console.components.tree-table :as c.tree-table]))
 
 (defn entity? [v]
   (try
     (not (nil? (:db/id v)))
-    (catch js/Error e false)))
+    (catch js/Error _e false)))
 
-(defn expandable-row? [[a v]]
+(defn expandable-row? [[_a v]]
   (if (set? v)
     (entity? (first v))
     (entity? v)))
@@ -42,38 +45,70 @@
     (set? v) (map-indexed (fn [i vv] [(str a " " i) vv]) v)
     (entity? v) (entity->rows v)))
 
+(defn string-cell []
+  (let [expanded-text? (r/atom false)]
+    (fn [s]
+      (if (< (count s) 45)
+        [:div s]
+        [:div {:class (str "cursor-pointer " (if-not @expanded-text? "min-w-max" "w-96"))
+                :on-click #(reset! expanded-text? (not @expanded-text?))}
+         (if @expanded-text? s (str (subs s 0 45) "..."))]))))
+
+
 (defn render-col [col]
   (cond
     (set? col) (str "#[" (count col) " item" (when (< 1 (count col)) "s") "]")
     (entity? col) (str (select-keys col [:db/id]))
+    (string? col) [string-cell col]
     :else (str col)))
 
-(defn entity [conn]
+
+
+(defn lookup-form []
   (let [lookup (r/atom "")
-        entity (r/atom nil)]
-    (fn []
-      [:div {:class "w-full h-full overflow-auto pb-5"}
+        input-error (r/atom nil)]
+    (fn [conn on-submit]
+      [:div
        [:form {:class "flex items-end"
                :on-submit
                (fn [e]
                  (.preventDefault e)
-                 (reset! entity (d/entity @conn (cljs.reader/read-string @lookup))))}
-        [:label {:class "block pt-1 pl-1"}
+                 (try
+                   (d/entity @conn (cljs.reader/read-string @lookup))
+                   (on-submit @lookup)
+                   (reset! lookup "")
+                   (reset! input-error nil)
+                   (catch js/Error e
+                     (reset! input-error (goog.object/get e "message")))))}
+        [:label {:class "block pl-1"}
          [:p {:class "font-bold"} "Entity lookup"]
          [:input {:type "text"
-                  :placeholder "id or [:uniq-attr1 \"v1\" ...]"
-                  :class "border py-1 px-2 rounded w-56"
+                  :name "lookup"
                   :value @lookup
-                  :on-change #(reset! lookup (.-value (.-target %)))
-                  }]]
-        [:button {:type "submit" 
-                  :class "ml-1 py-1 px-2 rounded bg-gray-200 border"} 
+                  :on-change (fn [e] (reset! lookup (goog.object/getValueByKeys e #js ["target" "value"])))
+                  :placeholder "id or [:uniq-attr1 \"v1\" ...]"
+                  :class "border py-1 px-2 rounded w-56"}]]
+        [:button {:type "submit"
+                  :class "ml-1 py-1 px-2 rounded bg-gray-200 border"}
          "Get entity"]]
-       (when @entity
-         [c.tree-table/tree-table
-          {:caption (str "entity " (select-keys @entity [:db/id]))
-           :head-row ["Attribute", "Value"]
-           :rows (entity->rows @entity)
-           :expandable-row? expandable-row?
-           :expand-row expand-row
-           :render-col render-col}])])))
+       (when @input-error
+         [:div {:class "bg-red-200 m-4 p-4 rounded"}
+          [:p @input-error]])])))
+
+(defn entity []
+  (fn [conn entity-lookup-ratom]
+    (let [entity (d/entity @conn (cljs.reader/read-string @entity-lookup-ratom))]
+      [:div {:class "flex flex-col w-full pb-5"}
+       [lookup-form conn #(reset! entity-lookup-ratom %)]
+       [:div {:class "pt-2"}
+        (when entity
+          [c.tree-table/tree-table
+           {:caption (str "entity " (select-keys entity [:db/id]))
+            :conn conn
+            :head-row ["Attribute", "Value"]
+            :rows (entity->rows entity)
+            :expandable-row? expandable-row?
+            :expand-row expand-row
+            :render-col render-col}])]])))
+
+

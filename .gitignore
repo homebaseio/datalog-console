@@ -3,6 +3,9 @@ public/app/js
 public/app/out
 public/app/manifest.json
 public/cards/js
+shells/chrome/js
+shells/chrome/manifest.json
+shells/chrome/css/gen-styles.css
 
 /target
 /checkouts
@@ -26,3 +29,6 @@ pom.xml.asc
 .history
 .calva
 .cpcache
+shells/chrome/out
+public/js
+public/css/gen-styles.css

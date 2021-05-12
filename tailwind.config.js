@@ -13,6 +13,7 @@ module.exports = {
       '1/2': '50%',
       '3/4': '75%',
       'full': '100%',
+      'max': 'max-content',
     },
     borderWidth: {
       DEFAULT: '1px',
@@ -28,6 +29,7 @@ module.exports = {
     extend: {
       backgroundColor: ['even','odd'],
       borderWidth: ['hover'],
+      width: ["responsive", "hover", "focus"]
     }
   },
   plugins: [

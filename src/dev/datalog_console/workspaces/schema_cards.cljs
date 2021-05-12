@@ -42,7 +42,7 @@
 
 (ws/defcard schema-card
   {::wsm/align {:flex 1}
-   ::wsm/node-props {:style {:overflow "hidden" :padding 0}}}
+   ::wsm/node-props {:style {:padding 0}}}
   (ct.react/react-card
    (reagent/as-element [c.schema/schema conn])))
 

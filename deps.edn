@@ -4,5 +4,5 @@
  :deps {thheller/shadow-cljs {:mvn/version "2.11.25"}
         reagent/reagent {:mvn/version "1.0.0"}
         datascript/datascript {:mvn/version "1.0.7"}
-        binaryage/devtools {:mvn/version "1.0.2"}
+        binaryage/devtools {:mvn/version "1.0.2"} 
         nubank/workspaces {:mvn/version "1.0.16"}}}
