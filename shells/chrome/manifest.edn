@@ -1,0 +1,36 @@
+{:manifest_version        2
+ :name                    "Datalog Console"
+ :version                 "0.1.0"
+ :description             "Datalog DB administration panel for the chrome console"
+ :icons                   {"16"  "images/default/icon-16.png"
+                           "32"  "images/default/icon-32.png"
+                           "48"  "images/default/icon-48.png"
+                           "128" "images/default/icon-128.png"}
+ :shadow/outputs           {:content-script
+                            {:chrome/options {:matches ["<all_urls>"]
+                                              :run_at  "document_idle"}
+                             :entries        [datalog-console.chrome.extension.content-script.main]
+
+                             }
+
+                            :background
+                            {:chrome/options {:persistent false}
+                             :entries        [datalog-console.chrome.extension.background.main]}
+                            }
+
+ :permissions             ["file:///*" "http://*/*" "https://*/*"]
+ :externally-connectable  {:ids ["*"]}
+ :content-security-policy ["default-src 'self';"
+                           "script-src 'self' 'unsafe-eval' http://localhost:9610;"
+                           "connect-src * data: blob: filesystem:;"
+                           "style-src 'self' data: chrome-extension-resource: 'unsafe-inline';"
+                           "img-src 'self' data: chrome-extension-resource:;"
+                           "frame-src 'self' data: chrome-extension-resource:;"
+                           "font-src 'self' data: chrome-extension-resource:;"
+                           "media-src * data: blob: filesystem:;"]
+ :browser-action          {:default-icon  {"16"  "images/default/icon-16.png"
+                                           "32"  "images/default/icon-32.png"
+                                           "48"  "images/default/icon-48.png"
+                                           "128" "images/default/icon-128.png"}
+                           :default-popup "popups/disabled.html"}
+ :devtools-page           "devtools.html"}
