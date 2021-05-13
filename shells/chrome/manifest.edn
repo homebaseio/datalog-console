@@ -1,6 +1,6 @@
 {:manifest_version        2
  :name                    "Datalog Console"
- :version                 "0.0.0"
+ :version                 "0.1.0"
  :description             "Datalog DB administration panel for the chrome console"
  :icons                   {"16"  "images/default/icon-16.png"
                            "32"  "images/default/icon-32.png"
@@ -21,7 +21,7 @@
  :permissions             ["file:///*" "http://*/*" "https://*/*"]
  :externally-connectable  {:ids ["*"]}
  :content-security-policy ["default-src 'self';"
-                           "script-src 'self' 'unsafe-eval' http://localhost:9630;"
+                           "script-src 'self' 'unsafe-eval' http://localhost:9610;"
                            "connect-src * data: blob: filesystem:;"
                            "style-src 'self' data: chrome-extension-resource: 'unsafe-inline';"
                            "img-src 'self' data: chrome-extension-resource:;"

@@ -1,5 +1,47 @@
 # datalog-console
+
 Administration UI for Datascript, Datahike, and other Datalog databases
+
+## Integrations
+
+- [homebase-react](https://github.com/homebaseio/homebase-react) `>=0.7.0`
+
+## Installation and Usage
+
+Install the extension and visit a url with an Datalog db that has the `datalog-console` integration (such as the `homebase-react` [demo](https://homebaseio.github.io/homebase-react/#!/dev.example.todo)). You will see a green dot appear next to the icon with the following pop up message upon clicking the extension. 
+
+![Extension notification and popup message](docs/datalog-db-detected.png)
+
+Open the Chrome console and look for the Datalog DB tab. Load the database with the button in the top right of the panel and you are ready to go.
+![Datalog DB panel open in Chrome console](docs/chrome-panel.png)
+
+### Features
+
+You will find 3 views in the Datalog DB panel.
+- [Schema](#schema)
+- [Entities](#entities)
+- [Entity](#entity)
+
+![View of a loaded db in the Chrome panel](docs/loaded-db.png)
+
+#### Schema
+
+If a schema exists in the database it will use this and in the case of schema on read it will also infer the schema based on contents of the database. 
+
+_An example of Schema inference_.
+
+![Schema inference example](docs/schema.png)
+
+#### Entities
+
+Renders a list of entities found in the database. Clicking on any of these entities renders them in the Entity view.
+
+#### Entity
+
+Directly look up an entity by `id` or `unique attribute`. This renders a tree view of an entity where you can also traverse it's reverse references.
+
+
+---
 
 ## Development
 
