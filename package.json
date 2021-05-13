@@ -23,7 +23,7 @@
   },
   "devDependencies": {
     "autoprefixer": "^10.2.5",
-    "postcss": "^8.2.8",
+    "postcss": "^8.2.10",
     "postcss-cli": "^8.3.1",
     "shadow-cljs": "^2.12.4",
     "tailwindcss": "^2.0.3"
