@@ -1,16 +1,24 @@
 (ns datalog-console.chrome.extension.content-script.main
   (:require [goog.object :as gobj]))
 
-
-
 (def port (js/chrome.runtime.connect #js {:name ":datalog-console.remote/content-script-port"}))
 
-;; send message to background that datalog db is registered
-;; TODO: Actually check if a database exists. 
-;; Need to consider if it makes sense to prefetch the database when the application has registered.
-;; This would create overhead when people are not using the devtool.
-(when (js/document.documentElement.getAttribute "__datalog-console-remote-installed__")
-  (.postMessage port #js {":datalog-console.remote/db-detected" true}))
+(defn supports-datalog-console? []
+  (js/document.documentElement.getAttribute "__datalog-console-remote-installed__"))
+
+(defn detect-db! []
+  (when (supports-datalog-console?)
+    (.postMessage port #js {":datalog-console.remote/db-detected" true})))
+
+(defn init-detector! 
+  "Attempts to detect if the datalog console is supported in the current tab multiple times before giving up."
+  []
+  (detect-db!)
+  (js/setTimeout detect-db! 1000)
+  (js/setTimeout detect-db! 3000)
+  (js/setTimeout detect-db! 10000))
+
+(init-detector!)
 
 ;; forward devtool message to window
 (.addListener (gobj/get port "onMessage")
