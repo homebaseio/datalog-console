@@ -615,12 +615,20 @@ video {
   display: none;
 }
 
+.flex-row {
+  flex-direction: row;
+}
+
 .flex-col {
   flex-direction: column;
 }
 
 .items-end {
   align-items: flex-end;
+}
+
+.items-baseline {
+  align-items: baseline;
 }
 
 .justify-between {
@@ -655,6 +663,10 @@ video {
 
 .ml-1 {
   margin-left: 0.25rem;
+}
+
+.mb-2 {
+  margin-bottom: 0.5rem;
 }
 
 .min-w-max {
@@ -804,6 +816,10 @@ video {
 
 .w-96 {
   width: 24rem;
+}
+
+.w-1\/2 {
+  width: 50%;
 }
 
 .w-full {
