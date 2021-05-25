@@ -5,6 +5,7 @@
             [datalog-console.components.entity :as c.entity]
             [datalog-console.components.entities :as c.entities]
             [datalog-console.components.query :as c.query]
+            [datalog-console.components.transact :as c.transact]
             [datascript.core :as d]
             [goog.object :as gobj]
             [clojure.string :as str]
@@ -13,6 +14,7 @@
 
 
 (def rconn (r/atom (d/create-conn {})))
+(def rerror (r/atom nil))
 (def entity-lookup-ratom (r/atom ""))
 
 (try
@@ -29,16 +31,22 @@
   (let [port devtool-port]
     (.addListener (gobj/get port "onMessage")
                   (fn [msg]
-                    (when-let [db-str (gobj/getValueByKeys msg ":datalog-console.remote/remote-message")]
-                      (reset! rconn (d/conn-from-db (cljs.reader/read-string db-str))))))
+                    (when-let [remote-data (cljs.reader/read-string (gobj/getValueByKeys msg ":datalog-console.remote/remote-message"))]
+                      (let [{:keys [success error]} remote-data]
+                        (when success 
+                          (reset! rconn (d/conn-from-db (cljs.reader/read-string success)))
+                          (reset! rerror nil))
+                        ;; TODO: consider how to define remote error types so we can pass to correct component
+                        (when error (js/console.log "resetting error to: " error) (reset! rerror error)))))) 
 
     (.postMessage port #js {:name ":datalog-console.client/init" :tab-id current-tab-id}))
   (catch js/Error _e nil))
 
 (defn db-actions []
   (let [action (r/atom :entity)
-        tabbed-views [:entity :query]]
-    (fn [rconn entity-lookup-ratom]
+        tabbed-views [:entity :query :transact]
+        post-transaction #(post-message devtool-port :datalog-console.client/make-remote-transaction {:transaction %})]
+    (fn [rconn rerror entity-lookup-ratom]
       [:div {:class "flex flex-col overflow-hidden col-span-2"}
        [:ul {:class "text-xl border-b flex flex-row"}
         (doall (for [view-type tabbed-views]
@@ -50,7 +58,9 @@
          :entity [:div {:class "overflow-auto h-full w-full mt-2"}
                   [c.entity/entity @rconn entity-lookup-ratom]]
          :query  [:div {:class "overflow-auto h-full w-full mt-2"}
-                  [c.query/query @rconn]])])))
+                  [c.query/query @rconn]]
+         :transact  [:div {:class "overflow-auto h-full w-full mt-2"}
+                     [c.transact/transact post-transaction @rerror]])])))
 
 (defn root []
   (let [loaded-db? (r/atom false)]
@@ -64,7 +74,7 @@
         [:h2 {:class "px-1 text-xl border-b pt-2"} "Entities"]
         [:div {:class "overflow-auto h-full w-full"}
          [c.entities/entities @rconn entity-lookup-ratom]]]
-       [db-actions rconn entity-lookup-ratom]
+       [db-actions rconn rerror entity-lookup-ratom]
        [:button
         {:class "absolute top-2 right-1 py-1 px-2 rounded bg-gray-200 border"
          :on-click (fn []

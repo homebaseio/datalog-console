@@ -2,9 +2,15 @@
   (:require [nubank.workspaces.core :as ws]
             [goog.object :as gobj]
             [cljs.reader]
+            [datascript.core :as d]
             [nubank.workspaces.card-types.react :as ct.react]
             [datalog-console.workspaces.entity-cards :refer [conn]]))
 
+(defn transact-from-remote! [conn transact-str]
+  (try
+    (d/transact conn (cljs.reader/read-string transact-str))
+    {:success (pr-str @conn)}
+    (catch js/Error e {:error (goog.object/get e "message")})))
 
 (defn enable-remote-database-inspection []
   ;; TODO: consider passing in a map to allow passing in extra information without creating breaking changes.
@@ -18,8 +24,11 @@
                            (case msg-type
 
                              :datalog-console.client/request-whole-database-as-string
-                             (.postMessage js/window #js {":datalog-console.remote/remote-message" (pr-str @conn)} "*")
+                             (.postMessage js/window #js {":datalog-console.remote/remote-message" (pr-str {:success (pr-str @conn)})} "*")
 
+                             :datalog-console.client/make-remote-transaction
+                             (let [transact-result (transact-from-remote! conn (:transaction (:data (cljs.reader/read-string devtool-message))))]
+                               (.postMessage js/window #js {":datalog-console.remote/remote-message" (pr-str transact-result)} "*"))
                              nil))))))
 
 
