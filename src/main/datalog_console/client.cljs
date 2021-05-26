@@ -17,6 +17,14 @@
 (def rerror (r/atom nil))
 (def entity-lookup-ratom (r/atom ""))
 
+
+(defn process-remote-data [{:keys [success error]}]
+  (when success
+    (reset! rconn (d/conn-from-db (cljs.reader/read-string success)))
+    (reset! rerror nil))
+    ;; TODO: consider how to define remote error types so we can pass to correct component
+  (when error (reset! rerror error)))
+
 (try
   (def current-tab-id js/chrome.devtools.inspectedWindow.tabId)
 
@@ -32,12 +40,7 @@
     (.addListener (gobj/get port "onMessage")
                   (fn [msg]
                     (when-let [remote-data (cljs.reader/read-string (gobj/getValueByKeys msg ":datalog-console.remote/remote-message"))]
-                      (let [{:keys [success error]} remote-data]
-                        (when success 
-                          (reset! rconn (d/conn-from-db (cljs.reader/read-string success)))
-                          (reset! rerror nil))
-                        ;; TODO: consider how to define remote error types so we can pass to correct component
-                        (when error (js/console.log "resetting error to: " error) (reset! rerror error)))))) 
+                      (process-remote-data remote-data)))) 
 
     (.postMessage port #js {:name ":datalog-console.client/init" :tab-id current-tab-id}))
   (catch js/Error _e nil))
