@@ -4,7 +4,7 @@
             [cljs.reader]
             [datascript.core :as d]
             [nubank.workspaces.card-types.react :as ct.react]
-            [datalog-console.workspaces.entity-cards :refer [conn]]))
+            [datalog-console.workspaces.workspace-db-conn :refer [conn]]))
 
 (defn transact-from-remote! [conn transact-str]
   (try
