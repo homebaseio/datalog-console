@@ -8,12 +8,12 @@ Administration UI for Datascript, Datahike, and other Datalog databases
 
 ## Installation and Usage
 
-1. **[Add the extension to Chrome](https://chrome.google.com/webstore/detail/datalog-console/cfgbajnnabfanfdkhpdhndegpmepnlmb)**
+1. **[Add the extension to Chrome/Edge](https://chrome.google.com/webstore/detail/datalog-console/cfgbajnnabfanfdkhpdhndegpmepnlmb)** or **[Firefox](https://addons.mozilla.org/en-US/firefox/addon/datalog-console/)**
 
 2. Visit a url with a Datalog DB that has the `datalog-console` integration (such as this `homebase-react` [example todo app](https://homebaseio.github.io/homebase-react/#!/dev.example.todo)). You will see a green dot appear next to the icon with the following pop up message upon clicking the extension. 
 ![Extension notification and popup message](docs/datalog-db-detected.png)
 
-3. Open the Chrome console and look for the Datalog DB tab. Load the database with the button in the top right of the panel and you are ready to go.
+3. Open the console and look for the Datalog DB tab. Load the database with the button in the top right of the panel and you are ready to go.
 ![Datalog DB panel open in Chrome console](docs/chrome-panel.png)
 
 ### Features
