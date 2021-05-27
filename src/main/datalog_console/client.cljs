@@ -35,21 +35,21 @@
     (.postMessage port #js {:name ":datalog-console.client/init" :tab-id current-tab-id}))
   (catch js/Error _e nil))
 
-(defn db-actions []
-  (let [action (r/atom :entity)
-        tabbed-views [:entity :query]]
+(defn tabs []
+  (let [active-tab (r/atom "Entity")
+        tabs ["Entity" "Query"]]
     (fn [rconn entity-lookup-ratom]
       [:div {:class "flex flex-col overflow-hidden col-span-2"}
        [:ul {:class "text-xl border-b flex flex-row"}
-        (doall (for [view-type tabbed-views]
-                 ^{:key (str view-type)}
-                 [:li {:class (str (when (= view-type @action) "border-b-4 border-blue-400 ") "px-2 pt-2 cursor-pointer hover:bg-blue-100 focus:bg-blue-100")
-                       :on-click #(reset! action view-type)}
-                  [:h2 (str/capitalize (name view-type))]]))]
-       (case @action
-         :entity [:div {:class "overflow-auto h-full w-full mt-2"}
+        (doall (for [tab-name tabs]
+                 ^{:key (str tab-name)}
+                 [:li {:class (str (when (= tab-name @active-tab) "border-b-4 border-blue-400 ") "px-2 pt-2 cursor-pointer hover:bg-blue-100 focus:bg-blue-100")
+                       :on-click #(reset! active-tab tab-name)}
+                  [:h2 tab-name]]))]
+       (case @active-tab
+         "Entity" [:div {:class "overflow-auto h-full w-full mt-2"}
                   [c.entity/entity @rconn entity-lookup-ratom]]
-         :query  [:div {:class "overflow-auto h-full w-full mt-2"}
+         "Query"  [:div {:class "overflow-auto h-full w-full mt-2"}
                   [c.query/query @rconn]])])))
 
 (defn root []
@@ -64,7 +64,7 @@
         [:h2 {:class "px-1 text-xl border-b pt-2"} "Entities"]
         [:div {:class "overflow-auto h-full w-full"}
          [c.entities/entities @rconn entity-lookup-ratom]]]
-       [db-actions rconn entity-lookup-ratom]
+       [tabs rconn entity-lookup-ratom]
        [:button
         {:class "absolute top-2 right-1 py-1 px-2 rounded bg-gray-200 border"
          :on-click (fn []
