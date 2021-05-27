@@ -4,8 +4,10 @@
             [datalog-console.components.schema :as c.schema]
             [datalog-console.components.entity :as c.entity]
             [datalog-console.components.entities :as c.entities]
+            [datalog-console.components.query :as c.query]
             [datascript.core :as d]
             [goog.object :as gobj]
+            [clojure.string :as str]
             [cljs.reader]))
 
 
@@ -33,6 +35,25 @@
     (.postMessage port #js {:name ":datalog-console.client/init" :tab-id current-tab-id}))
   (catch js/Error _e nil))
 
+(defn tabs []
+  (let [active-tab (r/atom "Entity")
+        tabs ["Entity" "Query"]]
+    @(r/track! #(do @entity-lookup-ratom
+                    (reset! active-tab "Entity")))
+    (fn [rconn entity-lookup-ratom]
+      [:div {:class "flex flex-col overflow-hidden col-span-2"}
+       [:ul {:class "text-xl border-b flex flex-row"}
+        (doall (for [tab-name tabs]
+                 ^{:key (str tab-name)}
+                 [:li {:class (str (when (= tab-name @active-tab) "border-b-4 border-blue-400 ") "px-2 pt-2 cursor-pointer hover:bg-blue-100 focus:bg-blue-100")
+                       :on-click #(reset! active-tab tab-name)}
+                  [:h2 tab-name]]))]
+       (case @active-tab
+         "Entity" [:div {:class "overflow-auto h-full w-full mt-2"}
+                   [c.entity/entity @rconn entity-lookup-ratom]]
+         "Query"  [:div {:class "overflow-auto h-full w-full mt-2"}
+                   [c.query/query @rconn]])])))
+
 (defn root []
   (let [loaded-db? (r/atom false)]
     (fn []
@@ -45,10 +66,7 @@
         [:h2 {:class "px-1 text-xl border-b pt-2"} "Entities"]
         [:div {:class "overflow-auto h-full w-full"}
          [c.entities/entities @rconn entity-lookup-ratom]]]
-       [:div {:class "flex flex-col overflow-hidden col-span-2"}
-        [:h2 {:class "px-1 text-xl border-b pt-2"} "Entity"]
-        [:div {:class "overflow-auto h-full w-full"}
-         [c.entity/entity @rconn entity-lookup-ratom]]]
+       [tabs rconn entity-lookup-ratom]
        [:button
         {:class "absolute top-2 right-1 py-1 px-2 rounded bg-gray-200 border"
          :on-click (fn []
