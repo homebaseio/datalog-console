@@ -38,6 +38,8 @@
 (defn tabs []
   (let [active-tab (r/atom "Entity")
         tabs ["Entity" "Query"]]
+    @(r/track! #(do @entity-lookup-ratom
+                    (reset! active-tab "Entity")))
     (fn [rconn entity-lookup-ratom]
       [:div {:class "flex flex-col overflow-hidden col-span-2"}
        [:ul {:class "text-xl border-b flex flex-row"}
@@ -48,9 +50,9 @@
                   [:h2 tab-name]]))]
        (case @active-tab
          "Entity" [:div {:class "overflow-auto h-full w-full mt-2"}
-                  [c.entity/entity @rconn entity-lookup-ratom]]
+                   [c.entity/entity @rconn entity-lookup-ratom]]
          "Query"  [:div {:class "overflow-auto h-full w-full mt-2"}
-                  [c.query/query @rconn]])])))
+                   [c.query/query @rconn]])])))
 
 (defn root []
   (let [loaded-db? (r/atom false)]

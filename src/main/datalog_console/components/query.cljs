@@ -2,7 +2,8 @@
   (:require [datascript.core :as d]
             [reagent.core :as r]
             [cljs.reader]
-            [cljs.pprint]))
+            [cljs.pprint]
+            [datalog-console.lib.localstorage :as localstorage]))
 
 (def example-queries
   {"All attributes" "[:find [?attr ...] \n :where [_ ?attr]]"
@@ -28,7 +29,8 @@
                                                    2 (reverse (sort result)))))]]])))
 
 (defn query []
-  (let [query-text (r/atom (:all-attrs example-queries))
+  (let [saved-query-text (localstorage/get-item (str ::query-text))
+        query-text (r/atom (or saved-query-text (get example-queries "All attributes")))
         query-result (r/atom nil)]
     (fn [conn]
       [:div {:class "px-1"}
@@ -53,7 +55,8 @@
            :rows          5
            :value        @query-text
            :on-change    (fn [e]
-                           (reset! query-text (goog.object/getValueByKeys e #js ["target" "value"])))}]
+                           (reset! query-text (goog.object/getValueByKeys e #js ["target" "value"]))
+                           (localstorage/set-item! (str ::query-text) @query-text))}]
          [:button {:type "submit"
                    :class "py-1 px-2 rounded-b bg-gray-200 border"}
           "Run query"]]]
