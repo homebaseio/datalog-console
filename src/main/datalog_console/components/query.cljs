@@ -4,31 +4,31 @@
             [cljs.reader]
             [cljs.pprint]))
 
-(def example-querys 
+(def example-queries
   {"All attributes" "[:find [?attr ...] \n :where [_ ?attr]]"
    "All entities" "[:find ?e ?a ?v \n :where \n [?e ?a ?v]]"
    "Example and query" "[:find ?e \n :where \n [?e :attr1 \"value 1\"] \n [?e :attr2 \"value 2\"]]"})
 
 (defn result []
-  (let [sort-action (r/atom 0)]
+  (let [sort-direction (r/atom 0)]
     (fn [result]
       [:<>
        [:div {:class "flex flex-row justify-between items-baseline mt-4 mb-2 "}
         [:span (str "Query results: " (count result))]
         [:button {:class "ml-1 py-1 px-2 rounded bg-gray-200 border w-24"
-                  :on-click #(swap! sort-action (fn [x] (mod (inc x) 3)))}
-         (case @sort-action
+                  :on-click #(swap! sort-direction (fn [x] (mod (inc x) 3)))}
+         (case @sort-direction
            0 "Sort"
            1 "↓"
            2 "↑")]]
        [:div {:class "border p-4 rounded overflow-auto"}
-        [:pre  (with-out-str (cljs.pprint/pprint (case @sort-action
+        [:pre  (with-out-str (cljs.pprint/pprint (case @sort-direction
                                                    0 result
                                                    1 (sort result)
                                                    2 (reverse (sort result)))))]]])))
 
 (defn query []
-  (let [query-text (r/atom (:all-attrs example-querys))
+  (let [query-text (r/atom (:all-attrs example-queries))
         query-result (r/atom nil)]
     (fn [conn]
       [:div {:class "px-1"}
@@ -36,7 +36,7 @@
        [:div {:class "flex justify-between mb-2 items-baseline"
               :style {:min-width "20rem"}}
         [:div {:class "-ml-1"}
-         (for [[k v] example-querys]
+         (for [[k v] example-queries]
            ^{:key (str k)}
            [:button {:class "ml-1 mt-1 py-1 px-2 rounded bg-gray-200 border"
                      :on-click #(reset! query-text v)} k])]]
