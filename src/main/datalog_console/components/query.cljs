@@ -29,9 +29,10 @@
                                                    2 (reverse (sort result)))))]]])))
 
 (defn query []
-  (let [saved-query-text (localstorage/get-item (str ::query-text))
-        query-text (r/atom (or saved-query-text (get example-queries "All attributes")))
-        query-result (r/atom nil)]
+  (let [saved-query (localstorage/get-item (str ::query-text))
+        query-text (r/atom (or saved-query (get example-queries "All attributes")))
+        query-result (r/atom nil)
+        query-error (r/atom nil)]
     (fn [conn]
       [:div {:class "px-1"}
        [:p {:class "font-bold"} "Query Editor"]
@@ -41,13 +42,15 @@
          (for [[k v] example-queries]
            ^{:key (str k)}
            [:button {:class "ml-1 mt-1 py-1 px-2 rounded bg-gray-200 border"
-                     :on-click #(reset! query-text v)} k])]]
+                     :on-click #(reset! query v)} k])]]
        [:form {:on-submit (fn [e]
                             (.preventDefault e)
                             (try
-                              (reset! query-result {:success (d/q (cljs.reader/read-string @query-text) @conn)})
+                              (reset! query-result (d/q (cljs.reader/read-string @query-text) @conn))
+                              (reset! query-error nil)
                               (catch js/Error e
-                                (reset! query-result {:error (goog.object/get e "message")}))))}
+                                (reset! query-result nil)
+                                (reset! query-error (goog.object/get e "message")))))}
         [:div {:class "flex flex-col"}
          [:textarea
           {:style {:min-width "20rem"}
@@ -61,8 +64,8 @@
                    :class "py-1 px-2 rounded-b bg-gray-200 border"}
           "Run query"]]]
        [:div {:style {:min-width "20rem"}}
-        (when-let [q-result (:success @query-result)]
-          [result q-result])
-        (when-let [q-error (:error @query-result)]
+        (when @query-error
           [:div {:class "bg-red-200 p-4 rounded"}
-           [:p q-error]])]])))
+           [:p @query-error]])
+        (when @query-result 
+          [result @query-result])]])))
