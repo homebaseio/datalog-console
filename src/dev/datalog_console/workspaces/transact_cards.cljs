@@ -8,11 +8,13 @@
             [datalog-console.workspaces.workspace-db-conn :refer [conn]]
             [datalog-console.client :as c.client]))
 
-(defn fake-remote-transaction [conn transact-str]
+;; TODO: rethink how we want to handle the db state for cards
+
+#_(defn fake-remote-transaction [conn transact-str]
   (c.client/process-remote-data
    (transact-from-remote! conn transact-str)))
 
-(ws/defcard transact-card
+#_(ws/defcard transact-card
   {::wsm/align {:flex 1}
    ::wsm/node-props {:style {:padding 0}}}
   (ct.react/react-card

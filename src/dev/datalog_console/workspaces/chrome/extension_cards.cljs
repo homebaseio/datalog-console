@@ -9,7 +9,7 @@
 (defn transact-from-remote! [conn transact-str]
   (try
     (d/transact conn (cljs.reader/read-string transact-str))
-    {:success (pr-str @conn)}
+    :success
     (catch js/Error e {:error (goog.object/get e "message")})))
 
 (defn enable-remote-database-inspection []
@@ -24,7 +24,7 @@
                            (case msg-type
 
                              :datalog-console.client/request-whole-database-as-string
-                             (.postMessage js/window #js {":datalog-console.remote/remote-message" (pr-str {:success (pr-str @conn)})} "*")
+                             (.postMessage js/window #js {":datalog-console.remote/remote-message" (pr-str @conn)} "*")
 
                              :datalog-console.client/transact!
                              (let [transact-result (transact-from-remote! conn (:data (cljs.reader/read-string devtool-message)))]

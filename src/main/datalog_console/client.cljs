@@ -8,22 +8,11 @@
             [datalog-console.components.transact :as c.transact]
             [datascript.core :as d]
             [goog.object :as gobj]
-            [clojure.string :as str]
             [cljs.reader]))
-
-
 
 (def rconn (r/atom (d/create-conn {})))
 (def rerror (r/atom nil))
 (def entity-lookup-ratom (r/atom ""))
-
-
-(defn process-remote-data [{:keys [success error]}]
-  (when success
-    (reset! rconn (d/conn-from-db (cljs.reader/read-string success)))
-    (reset! rerror nil))
-    ;; TODO: consider how to define remote error types so we can pass to correct component
-  (when error (reset! rerror error)))
 
 (try
   (def current-tab-id js/chrome.devtools.inspectedWindow.tabId)
@@ -39,12 +28,19 @@
   (let [port devtool-port]
     (.addListener (gobj/get port "onMessage")
                   (fn [msg]
-                    (when-let [remote-data (cljs.reader/read-string (gobj/getValueByKeys msg ":datalog-console.remote/remote-message"))]
-                      (process-remote-data remote-data)))) 
+                    (when-let [remote-message (cljs.reader/read-string (gobj/getValueByKeys msg ":datalog-console.remote/remote-message"))]
+                      (cond
+                        (d/db? remote-message)
+                        (reset! rconn (d/conn-from-db remote-message))
+
+                        (= :success remote-message)
+                        (post-message devtool-port :datalog-console.client/request-whole-database-as-string {})
+
+                        (:error remote-message)
+                        (reset! rerror (:error remote-message)))))) 
 
     (.postMessage port #js {:name ":datalog-console.client/init" :tab-id current-tab-id}))
   (catch js/Error _e nil))
-
 
 (defn tabs []
   (let [active-tab (r/atom "Entity")
