@@ -26,8 +26,8 @@
                              :datalog-console.client/request-whole-database-as-string
                              (.postMessage js/window #js {":datalog-console.remote/remote-message" (pr-str {:success (pr-str @conn)})} "*")
 
-                             :datalog-console.client/make-remote-transaction
-                             (let [transact-result (transact-from-remote! conn (:transaction (:data (cljs.reader/read-string devtool-message))))]
+                             :datalog-console.client/transact!
+                             (let [transact-result (transact-from-remote! conn (:data (cljs.reader/read-string devtool-message)))]
                                (.postMessage js/window #js {":datalog-console.remote/remote-message" (pr-str transact-result)} "*"))
                              nil))))))
 

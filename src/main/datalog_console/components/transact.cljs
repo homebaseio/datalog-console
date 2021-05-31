@@ -4,14 +4,14 @@
 
 (defn transact []
   (let [transact-text (r/atom nil)]
-    (fn [post-transaction rerror]
+    (fn [on-tx-submit rerror]
       [:div {:class "px-1"}
        [:p {:class "font-bold"} "Transact Editor"]
        [:div {:class "flex justify-between mb-2 items-baseline"
               :style {:min-width "20rem"}}]
        [:form {:on-submit (fn [e]
                             (.preventDefault e)
-                            (post-transaction @transact-text))}
+                            (on-tx-submit @transact-text))}
         [:div {:class "flex flex-col"}
          [:textarea
           {:style {:min-width "20rem"}
