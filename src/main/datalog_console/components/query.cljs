@@ -42,7 +42,7 @@
          (for [[k v] example-queries]
            ^{:key (str k)}
            [:button {:class "ml-1 mt-1 py-1 px-2 rounded bg-gray-200 border"
-                     :on-click #(reset! query v)} k])]]
+                     :on-click #(reset! query-text v)} k])]]
        [:form {:on-submit (fn [e]
                             (.preventDefault e)
                             (try
