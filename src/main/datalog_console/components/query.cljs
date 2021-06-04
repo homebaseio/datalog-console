@@ -30,11 +30,11 @@
 
 (defn query []
   (let [saved-query (r/atom ::loading)
-        _ (chromestorage/get-item ::query-text (fn [result] (reset! saved-query (goog.object/get result (str ::query-text)))))
         query-text (r/atom nil)
         query-result (r/atom nil)
         query-error (r/atom nil)]
     @(r/track #(reset! query-text (or @saved-query (get example-queries "All attributes"))))
+    (chromestorage/get-item ::query-text (fn [result] (reset! saved-query (goog.object/get result (str ::query-text)))))
     (fn [conn]
       (if (= ::loading @saved-query)
         [:div "Loading..."]
