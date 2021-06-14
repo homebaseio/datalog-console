@@ -57,7 +57,7 @@
     </dependency>
   </dependencies>
   <build>
-    <sourceDirectory>src/main</sourceDirectory>
+    <sourceDirectory>src/dev</sourceDirectory>
   </build>
   <repositories>
     <repository>
