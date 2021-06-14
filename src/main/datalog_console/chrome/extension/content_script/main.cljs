@@ -1,4 +1,5 @@
 (ns datalog-console.chrome.extension.content-script.main
+  {:no-doc true}
   (:require [goog.object :as gobj]))
 
 (def port (js/chrome.runtime.connect #js {:name ":datalog-console.remote/content-script-port"}))
