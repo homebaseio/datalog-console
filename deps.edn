@@ -1,6 +1,5 @@
 {:paths ["src/dev"
-         "src/main"
-         "src/test"]
+         "src/main"]
  :deps {thheller/shadow-cljs {:mvn/version "2.11.25"}
         reagent/reagent {:mvn/version "1.0.0"}
         datascript/datascript {:mvn/version "1.0.7"}
