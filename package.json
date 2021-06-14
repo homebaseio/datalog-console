@@ -1,6 +1,6 @@
 {
   "name": "datalog-console",
-  "version": "0.0.0",
+  "version": "0.2.2",
   "description": "Administration UI for Datalog databases.",
   "main": "index.js",
   "repository": "https://github.com/homebaseio/datalog-console.git",
@@ -19,7 +19,7 @@
     "build:workspaces": "shadow-cljs release workspaces",
     "build:chrome": "rm shells/chrome/manifest.json ; rm -rf shells/chrome/out ; rm -rf shells/chrome/js ; shadow-cljs release chrome chrome-devtool",
     "build": "yarn build:tailwind ; yarn build:workspaces ; yarn build:chrome",
-    "buildclean": "rm -rf .shadow-cljs; rm -rf node_modules; rm -rf .cpcache; rm -rf .calva; rm -rf shells/chrome/js; rm -rf shells/chrome/out; rm -rf public/js"
+    "build:clean": "rm -rf .shadow-cljs; rm -rf node_modules; rm -rf .cpcache; rm -rf .calva; rm -rf shells/chrome/js; rm -rf shells/chrome/out; rm -rf public/js"
   },
   "devDependencies": {
     "autoprefixer": "^10.2.5",

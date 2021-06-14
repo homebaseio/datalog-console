@@ -1,4 +1,5 @@
 (ns datalog-console.components.schema
+  {:no-doc true}
   (:require [datascript.core :as d]
             [datalog-console.components.tree-table :as c.tree-table]))
 

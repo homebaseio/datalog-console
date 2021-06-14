@@ -1,4 +1,5 @@
 (ns datalog-console.workspaces.schema-cards
+  {:no-doc true}
   (:require [nubank.workspaces.core :as ws]
             [nubank.workspaces.model :as wsm]
             [nubank.workspaces.card-types.react :as ct.react]
