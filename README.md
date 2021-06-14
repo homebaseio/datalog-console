@@ -21,9 +21,9 @@ Administration UI for Datascript, Datahike, and other Datalog databases
 (datalog-console/enable! {:conn conn})
 ```
 
-    - You can skip this step if you are using
-        - [homebase-react](https://github.com/homebaseio/homebase-react) `>=0.7.0`
-        - [Athens Research (web)](https://github.com/athensresearch/athens) `>=1.0.0-beta.81`
+  - You can skip this step if you are using
+    - [homebase-react](https://github.com/homebaseio/homebase-react) `>=0.7.0`
+    - [Athens Research (web)](https://github.com/athensresearch/athens) `>=1.0.0-beta.81`
 
 2. **[Add the extension to Chrome/Edge](https://chrome.google.com/webstore/detail/datalog-console/cfgbajnnabfanfdkhpdhndegpmepnlmb)** or **[Firefox](https://addons.mozilla.org/en-US/firefox/addon/datalog-console/)**
 
