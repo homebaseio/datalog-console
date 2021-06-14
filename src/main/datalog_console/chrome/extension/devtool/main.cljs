@@ -1,4 +1,5 @@
 (ns datalog-console.chrome.extension.devtool.main
+  {:no-doc true}
   (:require [clojure.edn]
             [cljs.reader]
             [reagent.dom :as rdom]

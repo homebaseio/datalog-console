@@ -1,4 +1,5 @@
 (ns datalog-console.chrome.extension.background.main
+  {:no-doc true}
   (:require [goog.object :as gobj]))
 
 

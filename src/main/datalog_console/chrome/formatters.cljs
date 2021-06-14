@@ -1,4 +1,5 @@
 (ns datalog-console.chrome.formatters
+  {:no-doc true}
   (:require [datascript.impl.entity :as de]
             [datalog-console.components.entity :as c.entity]
             [devtools.core :as devtools]
