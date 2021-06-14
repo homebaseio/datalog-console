@@ -4,16 +4,37 @@ Administration UI for Datascript, Datahike, and other Datalog databases
 
 ## Integrations
 
-- [homebase-react](https://github.com/homebaseio/homebase-react) `>=0.7.0`
+- [datascript](https://github.com/tonsky/datascript)
 
 ## Installation and Usage
 
-1. **[Add the extension to Chrome/Edge](https://chrome.google.com/webstore/detail/datalog-console/cfgbajnnabfanfdkhpdhndegpmepnlmb)** or **[Firefox](https://addons.mozilla.org/en-US/firefox/addon/datalog-console/)**
+[![Clojars Project](https://img.shields.io/clojars/v/io.homebase/datalog-console.svg)](https://clojars.org/io.homebase/datalog-console)
 
-2. Visit a url with a Datalog DB that has the `datalog-console` integration (such as this `homebase-react` [example todo app](https://homebaseio.github.io/homebase-react/#!/dev.example.todo)). You will see a green dot appear next to the icon with the following pop up message upon clicking the extension. 
+1. Ensure Datalog Console message handlers are enabled on the application you want to connect to. 
+
+```clojure 
+(ns your-app
+  (:require 
+   [io.homebase/datalog-console.integrations.datascript :as datalog-console]))
+
+; e.g. enable the message handlers on a datascript db conn
+(datalog-console/enable! {:conn conn})
+```
+
+    - You can skip this step if you are using
+        - [homebase-react](https://github.com/homebaseio/homebase-react) `>=0.7.0`
+        - [Athens Research (web)](https://github.com/athensresearch/athens) `>=1.0.0-beta.81`
+
+2. **[Add the extension to Chrome/Edge](https://chrome.google.com/webstore/detail/datalog-console/cfgbajnnabfanfdkhpdhndegpmepnlmb)** or **[Firefox](https://addons.mozilla.org/en-US/firefox/addon/datalog-console/)**
+
+3. Visit a url with a Datalog DB that has the `datalog-console` integration (such as this `homebase-react` [example todo app](https://homebaseio.github.io/homebase-react/#!/dev.example.todo))
+
+4. You will see a green dot appear next to the icon with the following pop up message upon clicking the extension. 
+
 ![Extension notification and popup message](docs/datalog-db-detected.png)
 
-3. Open the console and look for the Datalog DB tab. Load the database with the button in the top right of the panel and you are ready to go.
+5. Open the console and look for the Datalog DB tab. Load the database with the button in the top right of the panel and you are ready to go. 
+
 ![Datalog DB panel open in Chrome console](docs/chrome-panel.png)
 
 ### Features
@@ -113,8 +134,3 @@ The first one you only have access to via postMessage to the window. You also ge
 (Fig: 2) - To view the background page go to `about:debugging#/runtime/this-firefox` and click here:
 
 ![Datalog Firefox Extension background page](docs/firefox-extension.png)
-
-
-### Quirks
-
-Execution of code inside of `content-script` will not run on `www.google.com`
