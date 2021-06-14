@@ -1,4 +1,5 @@
 (ns datalog-console.workspaces.demo-cards
+  {:no-doc true}
   (:require [nubank.workspaces.core :as ws]
             [nubank.workspaces.card-types.react :as ct.react]
             [clojure.test :refer [is]]))

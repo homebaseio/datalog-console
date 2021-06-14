@@ -1,4 +1,5 @@
 (ns datalog-console.lib.chromestorage
+  {:no-doc true}
   (:require [goog.object :as gobj]))
 
 (defn set-item!

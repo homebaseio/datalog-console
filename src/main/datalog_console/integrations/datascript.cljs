@@ -2,7 +2,9 @@
   (:require [goog.object :as gobj]
             [cljs.reader]))
 
-(defn enable! [{:keys [conn]}]
+(defn enable! 
+  "Takes a [datascript](https://github.com/tonsky/datascript) database connection atom. Adds message handlers for a remote datalog-console process to communicate with. E.g. the datalog-console browser [extension](https://chrome.google.com/webstore/detail/datalog-console/cfgbajnnabfanfdkhpdhndegpmepnlmb?hl=en)."
+  [{:keys [conn]}]
   (js/document.documentElement.setAttribute "__datalog-console-remote-installed__" true)
   (.addEventListener js/window "message"
                      (fn [event]

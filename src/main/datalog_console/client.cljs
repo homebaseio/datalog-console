@@ -1,4 +1,5 @@
 (ns datalog-console.client
+  {:no-doc true}
   (:require [reagent.dom :as rdom]
             [reagent.core :as r]
             [datalog-console.components.schema :as c.schema]

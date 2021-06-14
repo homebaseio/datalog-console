@@ -1,4 +1,5 @@
-(ns datalog-console.lib.localstorage)
+(ns datalog-console.lib.localstorage
+  {:no-doc true})
 
 ;; https://gist.github.com/daveliepmann/cf923140702c8b1de301
 

@@ -1,4 +1,5 @@
 (ns datalog-console.components.entity
+  {:no-doc true}
   (:require [datascript.core :as d]
             [reagent.core :as r]
             [cljs.reader]

@@ -1,4 +1,5 @@
 (ns datalog-console.workspaces.chrome.extension-cards
+  {:no-doc true}
   (:require [nubank.workspaces.core :as ws]
             [cljs.reader]
             [nubank.workspaces.card-types.react :as ct.react]
