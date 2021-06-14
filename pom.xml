@@ -4,7 +4,7 @@
   <packaging>jar</packaging>
   <groupId>io.homebase</groupId>
   <artifactId>datalog-console</artifactId>
-  <version>0.1.0-SNAPSHOT</version>
+  <version>0.2.2</version>
   <name>datalog-console</name>
   <description>Administration UI for Datascript, Datahike, and other Datalog databases</description>
   <url>https://github.com/homebaseio/datalog-console</url>
