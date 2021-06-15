@@ -1,9 +1,10 @@
 (ns datalog-console.components.query
+  {:no-doc true}
   (:require [datascript.core :as d]
             [reagent.core :as r]
             [cljs.reader]
             [cljs.pprint]
-            [datalog-console.lib.localstorage :as localstorage]))
+            [datalog-console.lib.chromestorage :as chromestorage]))
 
 (def example-queries
   {"All attributes" "[:find [?attr ...] \n :where [_ ?attr]]"
@@ -29,43 +30,49 @@
                                                    2 (reverse (sort result)))))]]])))
 
 (defn query []
-  (let [saved-query (localstorage/get-item (str ::query-text))
-        query-text (r/atom (or saved-query (get example-queries "All attributes")))
+  (let [saved-query (r/atom ::loading)
+        query-text (r/atom nil)
         query-result (r/atom nil)
         query-error (r/atom nil)]
+    @(r/track #(reset! query-text (or @saved-query (get example-queries "All attributes"))))
+    (chromestorage/get-item ::query-text (fn [result] (reset! saved-query (goog.object/get result (str ::query-text)))))
     (fn [conn]
-      [:div {:class "px-1"}
-       [:p {:class "font-bold"} "Query Editor"]
-       [:div {:class "flex justify-between mb-2 items-baseline"
-              :style {:min-width "20rem"}}
-        [:div {:class "-ml-1"}
-         (for [[k v] example-queries]
-           ^{:key (str k)}
-           [:button {:class "ml-1 mt-1 py-1 px-2 rounded bg-gray-200 border"
-                     :on-click #(reset! query v)} k])]]
-       [:form {:on-submit (fn [e]
-                            (.preventDefault e)
-                            (try
-                              (reset! query-result (d/q (cljs.reader/read-string @query-text) @conn))
-                              (reset! query-error nil)
-                              (catch js/Error e
-                                (reset! query-result nil)
-                                (reset! query-error (goog.object/get e "message")))))}
-        [:div {:class "flex flex-col"}
-         [:textarea
-          {:style {:min-width "20rem"}
-           :class        "border p-2"
-           :rows          5
-           :value        @query-text
-           :on-change    (fn [e]
-                           (reset! query-text (goog.object/getValueByKeys e #js ["target" "value"]))
-                           (localstorage/set-item! (str ::query-text) @query-text))}]
-         [:button {:type "submit"
-                   :class "py-1 px-2 rounded-b bg-gray-200 border"}
-          "Run query"]]]
-       [:div {:style {:min-width "20rem"}}
-        (when @query-error
-          [:div {:class "bg-red-200 p-4 rounded"}
-           [:p @query-error]])
-        (when @query-result 
-          [result @query-result])]])))
+      (if (= ::loading @saved-query)
+        [:div "Loading..."]
+        [:div {:class "px-1"}
+         [:p {:class "font-bold"} "Query Editor"]
+         [:div {:class "flex justify-between mb-2 items-baseline"
+                :style {:min-width "20rem"}}
+          [:div {:class "-ml-1"}
+           (for [[k v] example-queries]
+             ^{:key (str k)}
+             [:button {:class "ml-1 mt-1 py-1 px-2 rounded bg-gray-200 border"
+                       :on-click (fn [] 
+                                   (reset! query-text v)
+                                   (chromestorage/set-item! ::query-text v))} k])]]
+         [:form {:on-submit (fn [e]
+                              (.preventDefault e)
+                              (try
+                                (reset! query-result (d/q (cljs.reader/read-string @query-text) @conn))
+                                (reset! query-error nil)
+                                (catch js/Error e
+                                  (reset! query-result nil)
+                                  (reset! query-error (goog.object/get e "message")))))}
+          [:div {:class "flex flex-col"}
+           [:textarea
+            {:style {:min-width "20rem"}
+             :class        "border p-2"
+             :rows          5
+             :value        @query-text
+             :on-change    (fn [e]
+                             (reset! query-text (goog.object/getValueByKeys e #js ["target" "value"]))
+                             (chromestorage/set-item! ::query-text @query-text))}]
+           [:button {:type "submit"
+                     :class "py-1 px-2 rounded-b bg-gray-200 border"}
+            "Run query"]]]
+         [:div {:style {:min-width "20rem"}}
+          (when @query-error
+            [:div {:class "bg-red-200 p-4 rounded"}
+             [:p @query-error]])
+          (when @query-result
+            [result @query-result])]]))))

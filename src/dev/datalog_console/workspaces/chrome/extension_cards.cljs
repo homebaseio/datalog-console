@@ -1,6 +1,6 @@
 (ns datalog-console.workspaces.chrome.extension-cards
+  {:no-doc true}
   (:require [nubank.workspaces.core :as ws]
-            [goog.object :as gobj]
             [cljs.reader]
             [datascript.core :as d]
             [nubank.workspaces.card-types.react :as ct.react]
@@ -33,11 +33,13 @@
 
 
 (enable-remote-database-inspection)
+            [datalog-console.workspaces.entity-cards :refer [conn]]
+            [datalog-console.integrations.datascript :as integrations]))
 
+(integrations/enable! {:conn conn})
 
 (defn element [name props & children]
   (apply js/React.createElement name (clj->js props) children))
-
 
 (ws/defcard chrome-extension-card
   (ct.react/react-card

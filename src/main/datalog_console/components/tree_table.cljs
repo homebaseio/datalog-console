@@ -1,4 +1,5 @@
 (ns datalog-console.components.tree-table
+  {:no-doc true}
   (:require [reagent.core :as r]
             [clojure.set]))
 

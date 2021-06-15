@@ -1,4 +1,5 @@
 (ns datalog-console.client
+  {:no-doc true}
   (:require [reagent.dom :as rdom]
             [reagent.core :as r]
             [datalog-console.components.schema :as c.schema]
@@ -8,6 +9,7 @@
             [datalog-console.components.transact :as c.transact]
             [datascript.core :as d]
             [goog.object :as gobj]
+            [clojure.string :as str]
             [cljs.reader]))
 
 (def rconn (r/atom (d/create-conn {})))
@@ -44,8 +46,12 @@
 
 (defn tabs []
   (let [active-tab (r/atom "Entity")
+<<<<<<< HEAD
         tabs ["Entity" "Query" "Transact"]
         on-tx-submit (fn [tx-str] (post-message devtool-port :datalog-console.client/transact! tx-str))]
+=======
+        tabs ["Entity" "Query"]]
+>>>>>>> main
     @(r/track! #(do @entity-lookup-ratom
                     (reset! active-tab "Entity")))
     (fn [rconn entity-lookup-ratom]
@@ -60,9 +66,13 @@
          "Entity" [:div {:class "overflow-auto h-full w-full mt-2"}
                    [c.entity/entity @rconn entity-lookup-ratom]]
          "Query"  [:div {:class "overflow-auto h-full w-full mt-2"}
+<<<<<<< HEAD
                    [c.query/query @rconn]]
          "Transact" [:div {:class "overflow-auto h-full w-full mt-2"}
                      [c.transact/transact on-tx-submit @rerror]])])))
+=======
+                   [c.query/query @rconn]])])))
+>>>>>>> main
 
 (defn root []
   (let [loaded-db? (r/atom false)]
