@@ -4,7 +4,7 @@
             [nubank.workspaces.card-types.react :as ct.react]
             [reagent.core :as reagent]
             [datalog-console.components.transact :as c.transact]
-            [datalog-console.workspaces.chrome.extension-cards :refer [transact-from-remote!]]
+            ;[datalog-console.workspaces.chrome.extension-cards :refer [transact-from-remote!]]
             [datalog-console.workspaces.workspace-db-conn :refer [conn]]
             [datalog-console.client :as c.client]))
 
