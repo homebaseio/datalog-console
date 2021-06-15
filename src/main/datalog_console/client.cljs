@@ -46,12 +46,8 @@
 
 (defn tabs []
   (let [active-tab (r/atom "Entity")
-<<<<<<< HEAD
         tabs ["Entity" "Query" "Transact"]
         on-tx-submit (fn [tx-str] (post-message devtool-port :datalog-console.client/transact! tx-str))]
-=======
-        tabs ["Entity" "Query"]]
->>>>>>> main
     @(r/track! #(do @entity-lookup-ratom
                     (reset! active-tab "Entity")))
     (fn [rconn entity-lookup-ratom]
@@ -66,13 +62,9 @@
          "Entity" [:div {:class "overflow-auto h-full w-full mt-2"}
                    [c.entity/entity @rconn entity-lookup-ratom]]
          "Query"  [:div {:class "overflow-auto h-full w-full mt-2"}
-<<<<<<< HEAD
                    [c.query/query @rconn]]
          "Transact" [:div {:class "overflow-auto h-full w-full mt-2"}
                      [c.transact/transact on-tx-submit @rerror]])])))
-=======
-                   [c.query/query @rconn]])])))
->>>>>>> main
 
 (defn root []
   (let [loaded-db? (r/atom false)]
