@@ -35,7 +35,7 @@
                         (d/db? remote-message)
                         (reset! rconn (d/conn-from-db remote-message))
 
-                        (= :success remote-message)
+                        (:datalog-console.client.response/transact! remote-message)
                         (post-message devtool-port :datalog-console.client/request-whole-database-as-string {})
 
                         (:error remote-message)

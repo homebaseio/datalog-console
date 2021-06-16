@@ -3,10 +3,10 @@
             [cljs.reader]
             [datascript.core :as d]))
 
-(defn transact-from-remote! [conn transact-str]
+(defn transact-from-devtool! [conn transact-str]
   (try
     (d/transact conn (cljs.reader/read-string transact-str))
-    :success
+    {:datalog-console.client.response/transact! :success}
     (catch js/Error e {:error (goog.object/get e "message")})))
 
 
@@ -24,7 +24,7 @@
                              (.postMessage js/window #js {":datalog-console.remote/remote-message" (pr-str @conn)} "*")
 
                              :datalog-console.client/transact!
-                             (let [transact-result (transact-from-remote! conn (:data (cljs.reader/read-string devtool-message)))]
+                             (let [transact-result (transact-from-devtool! conn (:data (cljs.reader/read-string devtool-message)))]
                                (.postMessage js/window #js {":datalog-console.remote/remote-message" (pr-str transact-result)} "*"))
 
                              nil))))))
