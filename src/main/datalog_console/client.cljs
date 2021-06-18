@@ -9,12 +9,42 @@
             [datascript.core :as d]
             [goog.object :as gobj]
             [clojure.string :as str]
+            [clojure.core.async :as async]
+            [com.wsscode.common.async-cljs :refer [<?maybe]]
+            [datalog-console.lib.version :as version]
             [cljs.reader]))
-
-
 
 (def rconn (r/atom (d/create-conn {})))
 (def entity-lookup-ratom (r/atom ""))
+(def stale-version? (r/atom false))
+(def responses (atom {}))
+
+(defonce message-handler-ch (async/chan (async/dropping-buffer 1024)))
+
+(defn event-data [event]
+  (let [r-event-data
+        (some-> event (gobj/get ":datalog-console.remote/remote-message") cljs.reader/read-string)]
+    r-event-data))
+
+(defn handle-response [data]
+  (cond
+    (d/db? data)
+    (reset! rconn (d/conn-from-db data))))
+
+(defn handle-remote-message [{:keys [port event responses*] :as message}]
+  (when-let [{:keys [type data]} (event-data event)]
+    (js/console.log type data)
+    (case type
+
+      ":datalog-console.client/message-response"
+      (handle-response data)
+
+      ":datalog-console.client/version-check"
+      (let [remote-version (:version data)]
+        (when (= -1 (version/compare remote-version version/last-datalog-console-version))
+          (reset! stale-version? true)))
+
+      (js/console.log "Unknown message" type))))
 
 (try
   (def current-tab-id js/chrome.devtools.inspectedWindow.tabId)
@@ -30,10 +60,18 @@
   (let [port devtool-port]
     (.addListener (gobj/get port "onMessage")
                   (fn [msg]
-                    (when-let [db-str (gobj/getValueByKeys msg ":datalog-console.remote/remote-message")]
-                      (reset! rconn (d/conn-from-db (cljs.reader/read-string db-str))))))
+                    (async/put! message-handler-ch
+                                {:port       port
+                                 :event      msg
+                                 :responses  responses})
+                    (async/go
+                      (loop []
+                        (when-let [msg (async/<! message-handler-ch)]
+                          (<?maybe (handle-remote-message msg))
+                          (recur))))))
 
-    (.postMessage port #js {:name ":datalog-console.client/init" :tab-id current-tab-id}))
+    (.postMessage port #js {:name ":datalog-console.client/init" :tab-id current-tab-id})
+    (post-message devtool-port :datalog-console.client/version-check {}))
   (catch js/Error _e nil))
 
 (defn tabs []
@@ -58,22 +96,28 @@
 (defn root []
   (let [loaded-db? (r/atom false)]
     (fn []
-      [:div {:class "relative text-xs h-full w-full grid grid-cols-4"}
-       [:div {:class "flex flex-col border-r pt-2 overflow-hidden col-span-1 "}
-        [:h2 {:class "pl-1 text-xl border-b flex center"} "Schema"]
-        [:div {:class "overflow-auto h-full w-full"}
-         [c.schema/schema @rconn]]]
-       [:div {:class "flex flex-col border-r overflow-hidden col-span-1 "}
-        [:h2 {:class "px-1 text-xl border-b pt-2"} "Entities"]
-        [:div {:class "overflow-auto h-full w-full"}
-         [c.entities/entities @rconn entity-lookup-ratom]]]
-       [tabs rconn entity-lookup-ratom]
-       [:button
-        {:class "absolute top-2 right-1 py-1 px-2 rounded bg-gray-200 border"
-         :on-click (fn []
-                     (when-not @loaded-db? (reset! loaded-db? true))
-                     (post-message devtool-port :datalog-console.client/request-whole-database-as-string {}))}
-        (if @loaded-db? "Refresh database" "Load database")]])))
+      [:<>
+       (when @stale-version? [:div {:class "bg-red-500 p-4 flex justify-between items-baseline"}
+                              [:span {:class "text-white"} [:b "WARNING:"]" Datalog Console integration is on an older version. Some features of Datalog Console may not work. Please update the integration version."]
+                              [:button {:class "py-1 px-2 rounded bg-gray-200 borderrounded bg-gray-200 border"
+                                        :on-click #(reset! stale-version? false)}
+                               "Dismiss warning"]])
+       [:div {:class "relative text-xs h-full w-full grid grid-cols-4"}
+        [:div {:class "flex flex-col border-r pt-2 overflow-hidden col-span-1 "}
+         [:h2 {:class "pl-1 text-xl border-b flex center"} "Schema"]
+         [:div {:class "overflow-auto h-full w-full"}
+          [c.schema/schema @rconn]]]
+        [:div {:class "flex flex-col border-r overflow-hidden col-span-1 "}
+         [:h2 {:class "px-1 text-xl border-b pt-2"} "Entities"]
+         [:div {:class "overflow-auto h-full w-full"}
+          [c.entities/entities @rconn entity-lookup-ratom]]]
+        [tabs rconn entity-lookup-ratom]
+        [:button
+         {:class "absolute top-2 right-1 py-1 px-2 rounded bg-gray-200 border"
+          :on-click (fn []
+                      (when-not @loaded-db? (reset! loaded-db? true))
+                      (post-message devtool-port :datalog-console.client/request-whole-database-as-string {}))}
+         (if @loaded-db? "Refresh database" "Load database")]]])))
 
 (defn mount! []
   (rdom/render [root] (js/document.getElementById "root")))

@@ -1,6 +1,7 @@
 (ns datalog-console.integrations.datascript
   (:require [goog.object :as gobj]
-            [cljs.reader]))
+            [cljs.reader]
+            [datalog-console.lib.version :as version]))
 
 (defn enable! 
   "Takes a [datascript](https://github.com/tonsky/datascript) database connection atom. Adds message handlers for a remote datalog-console process to communicate with. E.g. the datalog-console browser [extension](https://chrome.google.com/webstore/detail/datalog-console/cfgbajnnabfanfdkhpdhndegpmepnlmb?hl=en)."
@@ -13,6 +14,10 @@
                            (case msg-type
 
                              :datalog-console.client/request-whole-database-as-string
-                             (.postMessage js/window #js {":datalog-console.remote/remote-message" (pr-str @conn)} "*")
+                             (.postMessage js/window #js {":datalog-console.remote/remote-message" (pr-str {:type ":datalog-console.client/message-response"
+                                                                                                            :data @conn})} "*")
+                             :datalog-console.client/version-check
+                             (.postMessage js/window #js {":datalog-console.remote/remote-message" (pr-str {:type ":datalog-console.client/version-check"
+                                                                                                            :data {:version version/last-datalog-console-version}})} "*")
 
                              nil))))))

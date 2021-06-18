@@ -4,7 +4,9 @@
         reagent/reagent {:mvn/version "1.0.0"}
         datascript/datascript {:mvn/version "1.0.7"}
         binaryage/devtools {:mvn/version "1.0.2"}
-        nubank/workspaces {:mvn/version "1.0.16"}}
+        nubank/workspaces {:mvn/version "1.0.16"}
+        org.clojure/core.async {:mvn/version "1.3.618"}
+        com.wsscode/async {:mvn/version "2021.01.15"}}
  
  :aliases {:jar {:replace-deps {com.github.seancorfield/depstar {:mvn/version "2.0.216"}}
                  :exec-fn hf.depstar/jar
