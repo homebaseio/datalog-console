@@ -9,13 +9,14 @@
             [datascript.core :as d]
             [goog.object :as gobj]
             [clojure.string :as str]
+            [datalog-console.components.flag :as flag]
             [cljs.reader]))
 
 
 
 (def rconn (r/atom (d/create-conn {})))
 (def entity-lookup-ratom (r/atom ""))
-(def version (r/atom nil))
+(def integration-version (r/atom nil))
 
 (try
   (def current-tab-id js/chrome.devtools.inspectedWindow.tabId)
@@ -34,7 +35,7 @@
                     (when-let [response (cljs.reader/read-string (gobj/getValueByKeys msg ":datalog-console.remote/remote-message"))]
                       (cond
                         (d/db? response) (reset! rconn (d/conn-from-db response))
-                        (:version response) (reset! version (:version response))))))
+                        (:version response) (reset! integration-version (:version response))))))
 
     (.postMessage port #js {:name ":datalog-console.client/init" :tab-id current-tab-id})
     (post-message devtool-port :datalog-console.client/request-integration-version {}))
@@ -56,8 +57,9 @@
        (case @active-tab
          "Entity" [:div {:class "overflow-auto h-full w-full mt-2"}
                    [c.entity/entity @rconn entity-lookup-ratom]]
-         "Query"  [:div {:class "overflow-auto h-full w-full mt-2"}
-                   [c.query/query @rconn]])])))
+         "Query"  [flag/overlay "0.2.0" @integration-version 
+                   [:div {:class "overflow-auto h-full w-full mt-2"}
+                    [c.query/query @rconn]]])])))
 
 (defn root []
   (let [loaded-db? (r/atom false)]
