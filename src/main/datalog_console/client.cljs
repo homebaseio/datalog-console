@@ -15,6 +15,7 @@
 
 (def rconn (r/atom (d/create-conn {})))
 (def entity-lookup-ratom (r/atom ""))
+(def version (r/atom nil))
 
 (try
   (def current-tab-id js/chrome.devtools.inspectedWindow.tabId)
@@ -30,10 +31,13 @@
   (let [port devtool-port]
     (.addListener (gobj/get port "onMessage")
                   (fn [msg]
-                    (when-let [db-str (gobj/getValueByKeys msg ":datalog-console.remote/remote-message")]
-                      (reset! rconn (d/conn-from-db (cljs.reader/read-string db-str))))))
+                    (when-let [response (cljs.reader/read-string (gobj/getValueByKeys msg ":datalog-console.remote/remote-message"))]
+                      (cond
+                        (d/db? response) (reset! rconn (d/conn-from-db response))
+                        (:version response) (reset! version (:version response))))))
 
-    (.postMessage port #js {:name ":datalog-console.client/init" :tab-id current-tab-id}))
+    (.postMessage port #js {:name ":datalog-console.client/init" :tab-id current-tab-id})
+    (post-message devtool-port :datalog-console.client/request-integration-version {}))
   (catch js/Error _e nil))
 
 (defn tabs []
