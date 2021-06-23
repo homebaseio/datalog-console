@@ -10,11 +10,13 @@
             [datascript.core :as d]
             [goog.object :as gobj]
             [clojure.string :as str]
+            [datalog-console.components.flag :as flag]
             [cljs.reader]))
 
 (def rconn (r/atom (d/create-conn {})))
 (def rerror (r/atom nil))
 (def entity-lookup-ratom (r/atom ""))
+(def integration-version (r/atom nil))
 
 (try
   (def current-tab-id js/chrome.devtools.inspectedWindow.tabId)
@@ -35,13 +37,17 @@
                         (d/db? remote-message)
                         (reset! rconn (d/conn-from-db remote-message))
 
+                        (:version remote-message) 
+                        (reset! integration-version (:version remote-message))
+
                         (:datalog-console.client.response/transact! remote-message)
                         (post-message devtool-port :datalog-console.client/request-whole-database-as-string {})
 
                         (:error remote-message)
                         (reset! rerror (:error remote-message)))))) 
-
-    (.postMessage port #js {:name ":datalog-console.client/init" :tab-id current-tab-id}))
+            
+    (.postMessage port #js {:name ":datalog-console.client/init" :tab-id current-tab-id})
+    (post-message devtool-port :datalog-console.client/request-integration-version {}))
   (catch js/Error _e nil))
 
 (defn tabs []
@@ -63,8 +69,9 @@
                    [c.entity/entity @rconn entity-lookup-ratom]]
          "Query"  [:div {:class "overflow-auto h-full w-full mt-2"}
                    [c.query/query @rconn]]
-         "Transact" [:div {:class "overflow-auto h-full w-full mt-2"}
-                     [c.transact/transact on-tx-submit @rerror]])])))
+         "Transact" [flag/overlay "0.3.0" @integration-version 
+                     [:div {:class "overflow-auto h-full w-full mt-2"}
+                      [c.transact/transact on-tx-submit @rerror]]])])))
 
 (defn root []
   (let [loaded-db? (r/atom false)]
