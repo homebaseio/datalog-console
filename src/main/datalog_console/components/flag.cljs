@@ -30,6 +30,6 @@
       [:div {:class "mx-4 p-4 bg-gray-100 rounded"}
        [:span {:class "block"} "Feature is not supported with this console integration version"]
        [:div {:class "flex flex-row mt-4"}
-        [:span {:class "block p-2 border"} "Console " dc/version]
-        [:span {:class "block p-2 border ml-4"} "Integration " integration-v]]]]]))
+        [:span {:class "block p-2 border"} "Console: " dc/version]
+        [:span {:class "block p-2 border ml-4"} "Integration: " (if integration-v integration-v "Unknown Version")]]]]]))
 
