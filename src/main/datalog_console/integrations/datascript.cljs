@@ -2,7 +2,7 @@
   (:require [goog.object :as gobj]
             [cljs.reader]
             [datascript.core :as d]
-            [datalog-console.lib.version :as version]))
+            [datalog-console.lib.version :as dc]))
 
 (defn transact-from-devtool! [conn transact-str]
   (try
@@ -28,5 +28,5 @@
                                (.postMessage js/window #js {":datalog-console.remote/remote-message" (pr-str transact-result)} "*"))
 
                              :datalog-console.client/request-integration-version
-                             (.postMessage js/window #js {":datalog-console.remote/remote-message" (pr-str {:version version/datalog-version})})
+                             (.postMessage js/window #js {":datalog-console.remote/remote-message" (pr-str {:version dc/version})})
                              nil))))))

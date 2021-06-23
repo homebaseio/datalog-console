@@ -7,4 +7,4 @@
                 pom-version (first (:content (first (filter #(= (:tag %) :version) (:content (xml/parse pom-xml))))))]
             pom-version)))
 
-(def datalog-version (fetch-version))
+(def version (fetch-version))

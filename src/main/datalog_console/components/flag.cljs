@@ -1,6 +1,6 @@
 (ns datalog-console.components.flag
   (:require [clojure.string :as str]
-            [datalog-console.lib.version :as version])
+            [datalog-console.lib.version :as dc])
   (:refer-clojure :exclude [compare]))
 
 (defn parse-int [s]
@@ -30,6 +30,6 @@
       [:div {:class "mx-4 p-4 bg-gray-100 rounded"}
        [:span {:class "block"} "Feature is not supported with this console integration version"]
        [:div {:class "flex flex-row mt-4"}
-        [:span {:class "block p-2 border"} "Console " version/datalog-version]
+        [:span {:class "block p-2 border"} "Console " dc/version]
         [:span {:class "block p-2 border ml-4"} "Integration " integration-v]]]]]))
 
