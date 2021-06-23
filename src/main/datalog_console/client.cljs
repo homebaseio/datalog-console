@@ -10,7 +10,7 @@
             [datascript.core :as d]
             [goog.object :as gobj]
             [clojure.string :as str]
-            [datalog-console.components.flag :as flag]
+            [datalog-console.components.feature-flag :as feature-flag]
             [cljs.reader]))
 
 (def rconn (r/atom (d/create-conn {})))
@@ -69,7 +69,10 @@
                    [c.entity/entity @rconn entity-lookup-ratom]]
          "Query"  [:div {:class "overflow-auto h-full w-full mt-2"}
                    [c.query/query @rconn]]
-         "Transact" [flag/overlay "0.3.0" @integration-version 
+         "Transact" [feature-flag/version-check
+                     {:title "Transact"
+                      :required-version "0.3.0"
+                      :current-version @integration-version}
                      [:div {:class "overflow-auto h-full w-full mt-2"}
                       [c.transact/transact on-tx-submit @rerror]]])])))
 

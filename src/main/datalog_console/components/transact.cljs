@@ -22,7 +22,7 @@
                            (reset! transact-text (goog.object/getValueByKeys e #js ["target" "value"])))}]
          [:button {:type "submit"
                    :class "py-1 px-2 rounded-b bg-gray-200 border"}
-          "Run transaction"]]]
+          "Transact"]]]
        [:div {:style {:min-width "20rem"}}
         (when rerror
          [:div {:class "bg-red-200 p-4 rounded"}
