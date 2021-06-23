@@ -5,10 +5,9 @@
             [nubank.workspaces.card-types.react :as ct.react]
             [reagent.core :as r]
             [datalog-console.client :as client]
-            [datalog-console.workspaces.entity-cards :refer [conn]]))
+            [datalog-console.workspaces.workspace-db-conn :refer [conn]]))
 
 (reset! client/rconn conn)
-
 
 (ws/defcard client-card
   {::wsm/align {:flex 1}

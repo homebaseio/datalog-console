@@ -5,7 +5,7 @@
             [datascript.core :as d]
             [clojure.test :refer [is]]
             [datalog-console.chrome.formatters :as formatters]
-            [datalog-console.workspaces.entity-cards :refer [conn]]))
+            [datalog-console.workspaces.workspace-db-conn :refer [conn]]))
 
 (formatters/install!)
 

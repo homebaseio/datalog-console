@@ -3,7 +3,7 @@
   (:require [nubank.workspaces.core :as ws]
             [cljs.reader]
             [nubank.workspaces.card-types.react :as ct.react]
-            [datalog-console.workspaces.entity-cards :refer [conn]]
+            [datalog-console.workspaces.workspace-db-conn :refer [conn]]
             [datalog-console.integrations.datascript :as integrations]))
 
 (integrations/enable! {:conn conn})

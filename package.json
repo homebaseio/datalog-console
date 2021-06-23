@@ -1,6 +1,6 @@
 {
   "name": "datalog-console",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "description": "Administration UI for Datalog databases.",
   "main": "index.js",
   "repository": "https://github.com/homebaseio/datalog-console.git",

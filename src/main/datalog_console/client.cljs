@@ -6,15 +6,17 @@
             [datalog-console.components.entity :as c.entity]
             [datalog-console.components.entities :as c.entities]
             [datalog-console.components.query :as c.query]
+            [datalog-console.components.transact :as c.transact]
             [datascript.core :as d]
             [goog.object :as gobj]
             [clojure.string :as str]
+            [datalog-console.components.feature-flag :as feature-flag]
             [cljs.reader]))
 
-
-
 (def rconn (r/atom (d/create-conn {})))
+(def rerror (r/atom nil))
 (def entity-lookup-ratom (r/atom ""))
+(def integration-version (r/atom nil))
 
 (try
   (def current-tab-id js/chrome.devtools.inspectedWindow.tabId)
@@ -30,15 +32,28 @@
   (let [port devtool-port]
     (.addListener (gobj/get port "onMessage")
                   (fn [msg]
-                    (when-let [db-str (gobj/getValueByKeys msg ":datalog-console.remote/remote-message")]
-                      (reset! rconn (d/conn-from-db (cljs.reader/read-string db-str))))))
+                    (when-let [remote-message (cljs.reader/read-string (gobj/getValueByKeys msg ":datalog-console.remote/remote-message"))]
+                      (cond
+                        (d/db? remote-message)
+                        (reset! rconn (d/conn-from-db remote-message))
 
-    (.postMessage port #js {:name ":datalog-console.client/init" :tab-id current-tab-id}))
+                        (:version remote-message) 
+                        (reset! integration-version (:version remote-message))
+
+                        (:datalog-console.client.response/transact! remote-message)
+                        (post-message devtool-port :datalog-console.client/request-whole-database-as-string {})
+
+                        (:error remote-message)
+                        (reset! rerror (:error remote-message)))))) 
+            
+    (.postMessage port #js {:name ":datalog-console.client/init" :tab-id current-tab-id})
+    (post-message devtool-port :datalog-console.client/request-integration-version {}))
   (catch js/Error _e nil))
 
 (defn tabs []
   (let [active-tab (r/atom "Entity")
-        tabs ["Entity" "Query"]]
+        tabs ["Entity" "Query" "Transact"]
+        on-tx-submit (fn [tx-str] (post-message devtool-port :datalog-console.client/transact! tx-str))]
     @(r/track! #(do @entity-lookup-ratom
                     (reset! active-tab "Entity")))
     (fn [rconn entity-lookup-ratom]
@@ -53,7 +68,13 @@
          "Entity" [:div {:class "overflow-auto h-full w-full mt-2"}
                    [c.entity/entity @rconn entity-lookup-ratom]]
          "Query"  [:div {:class "overflow-auto h-full w-full mt-2"}
-                   [c.query/query @rconn]])])))
+                   [c.query/query @rconn]]
+         "Transact" [feature-flag/version-check
+                     {:title "Transact"
+                      :required-version "0.3.0"
+                      :current-version @integration-version}
+                     [:div {:class "overflow-auto h-full w-full mt-2"}
+                      [c.transact/transact on-tx-submit @rerror]]])])))
 
 (defn root []
   (let [loaded-db? (r/atom false)]
