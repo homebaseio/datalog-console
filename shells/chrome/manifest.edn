@@ -1,6 +1,6 @@
 {:manifest_version        2
  :name                    "Datalog Console"
- :version                 "0.3.1"
+ :version                 "0.3.2"
  :description             "Datalog DB administration panel for the chrome console"
  :icons                   {"16"  "images/default/icon-16.png"
                            "32"  "images/default/icon-32.png"

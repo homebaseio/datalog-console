@@ -1,4 +1,4 @@
 (ns datalog-console.lib.version
   {:no-doc true})
 
-(def version "0.3.1")
+(def version "0.3.2")

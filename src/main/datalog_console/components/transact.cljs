@@ -12,6 +12,7 @@
               :style {:min-width "20rem"}}]
        [:form {:on-submit (fn [e]
                             (.preventDefault e)
+                            (reset! rerror nil)
                             (on-tx-submit @transact-text))}
         [:div {:class "flex flex-col"}
          [:textarea
@@ -25,6 +26,6 @@
                    :class "py-1 px-2 rounded-b bg-gray-200 border"}
           "Transact"]]]
        [:div {:style {:min-width "20rem"}}
-        (when rerror
+        (when @rerror
          [:div {:class "bg-red-200 p-4 rounded"}
-          [:p rerror]])]])))
+          [:p @rerror]])]])))
