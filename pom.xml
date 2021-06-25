@@ -4,7 +4,7 @@
   <packaging>jar</packaging>
   <groupId>io.homebase</groupId>
   <artifactId>datalog-console</artifactId>
-  <version>0.3.0</version>
+  <version>0.3.1</version>
   <name>datalog-console</name>
   <description>Administration UI for Datascript, Datahike, and other Datalog databases</description>
   <url>https://github.com/homebaseio/datalog-console</url>
@@ -31,16 +31,6 @@
       <version>1.10.3</version>
     </dependency>
     <dependency>
-      <groupId>thheller</groupId>
-      <artifactId>shadow-cljs</artifactId>
-      <version>2.11.25</version>
-    </dependency>
-    <dependency>
-      <groupId>reagent</groupId>
-      <artifactId>reagent</artifactId>
-      <version>1.0.0</version>
-    </dependency>
-    <dependency>
       <groupId>datascript</groupId>
       <artifactId>datascript</artifactId>
       <version>1.0.7</version>
@@ -49,11 +39,6 @@
       <groupId>binaryage</groupId>
       <artifactId>devtools</artifactId>
       <version>1.0.2</version>
-    </dependency>
-    <dependency>
-      <groupId>nubank</groupId>
-      <artifactId>workspaces</artifactId>
-      <version>1.0.16</version>
     </dependency>
   </dependencies>
   <build>

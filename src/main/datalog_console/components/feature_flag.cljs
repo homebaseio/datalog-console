@@ -1,4 +1,5 @@
 (ns datalog-console.components.feature-flag
+  {:no-doc true}
   (:require [clojure.string :as str])
   (:refer-clojure :exclude [compare]))
 

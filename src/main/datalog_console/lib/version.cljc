@@ -1,10 +1,4 @@
 (ns datalog-console.lib.version
-  #?(:cljs (:require-macros [datalog-console.lib.version :refer [fetch-version]]))
-  #?(:clj (:require [clojure.data.xml :as xml])))
+  {:no-doc true})
 
-#?(:clj (defmacro fetch-version []
-          (let [pom-xml (java.io.StringReader. (slurp "pom.xml"))
-                pom-version (first (:content (first (filter #(= (:tag %) :version) (:content (xml/parse pom-xml))))))]
-            pom-version)))
-
-(def version (fetch-version))
+(def version "0.3.1")
