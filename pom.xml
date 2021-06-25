@@ -40,6 +40,11 @@
       <artifactId>devtools</artifactId>
       <version>1.0.2</version>
     </dependency>
+    <dependency>
+      <groupId>org.clojure</groupId>
+      <artifactId>data.xml</artifactId>
+      <version>0.0.8</version>
+    </dependency>
   </dependencies>
   <build>
     <sourceDirectory>src/dev</sourceDirectory>
