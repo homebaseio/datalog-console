@@ -1,5 +1,5 @@
-;; shadow-cljs configuration
-{:deps true
+{:deps {:aliases [:dev]}
+ 
  :http {:port 9610}
 
  :builds {:workspaces {:target nubank.workspaces.shadow-cljs.target

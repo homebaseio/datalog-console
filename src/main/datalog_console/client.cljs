@@ -71,7 +71,7 @@
                    [c.query/query @rconn]]
          "Transact" [feature-flag/version-check
                      {:title "Transact"
-                      :required-version "0.3.0"
+                      :required-version "0.3.1"
                       :current-version @integration-version}
                      [:div {:class "overflow-auto h-full w-full mt-2"}
                       [c.transact/transact on-tx-submit @rerror]]])])))
