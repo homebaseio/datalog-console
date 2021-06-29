@@ -31,4 +31,4 @@
                                :datalog-console.client/request-integration-version
                                (.postMessage js/window #js {":datalog-console.remote/remote-message" (pr-str {:version dc/version})})
                                nil)))))
-    (catch js/Error e e)))
+    (catch js/Error _e nil)))
