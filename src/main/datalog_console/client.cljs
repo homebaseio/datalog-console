@@ -74,7 +74,7 @@
                       :required-version "0.3.1"
                       :current-version @integration-version}
                      [:div {:class "overflow-auto h-full w-full mt-2"}
-                      [c.transact/transact on-tx-submit @rerror]]])])))
+                      [c.transact/transact on-tx-submit rerror]]])])))
 
 (defn root []
   (let [loaded-db? (r/atom false)]
