@@ -1,10 +1,11 @@
 (ns datalog-console.chrome.extension.background.main
   {:no-doc true}
-  (:require [goog.object :as gobj]))
+  (:require [goog.object :as gobj]
+            [cljs.reader]
+            [datalog-console.lib.messaging :as msg]))
 
-
-(defonce tools-conns* (atom {}))
-(defonce remote-conns* (atom {}))
+(defonce port-conns (atom {:tools {}
+                           :remote {}}))
 
 (defn set-icon-and-popup [tab-id]
   (js/chrome.browserAction.setIcon
@@ -17,58 +18,39 @@
    #js {:tabId tab-id
         :popup "popups/enabled.html"}))
 
-(defn handle-devtool-message [devtool-port message _port]
-  (let [tab-id (gobj/get message "tab-id")]
-    (cond
-      (= ":datalog-console.client/init" (gobj/get message "name"))
-      (swap! tools-conns* assoc tab-id devtool-port)
-
-      ;; send message to content-script
-      (gobj/getValueByKeys message ":datalog-console.client/devtool-message")
-      (.postMessage (get @remote-conns* tab-id) message))))
-
-
-(defn handle-remote-message [_remote-port message port]
-  (let [tab-id (gobj/getValueByKeys port "sender" "tab" "id")]
-    (cond
-      ; send message to devtool
-      (gobj/getValueByKeys message ":datalog-console.remote/remote-message")
-      (.postMessage (get @tools-conns* tab-id) message)
-
-      ; set icon and popup
-      (gobj/getValueByKeys message ":datalog-console.remote/db-detected")
-      (set-icon-and-popup tab-id))))
-
 (js/chrome.runtime.onConnect.addListener
  (fn [port]
-   (let [remove-listener (fn [port listener]
-                           (when-let [msg (gobj/get port "onMessage")]
-                             (.removeListener msg listener)))]
-     (case (gobj/get port "name")
+   (let [tab-id (atom (gobj/getValueByKeys port "sender" "tab" "id"))]
+     (msg/create-conn {:to port
+                       :send-fn (fn [{:keys [to msg]}]
+                                  (.postMessage to (clj->js {(str ::msg/msg) (pr-str msg)})))
+                       :tab-id tab-id
+                       :routes {:datalog-console.client/init! (fn [conn _msg]
+                                                                (swap! port-conns assoc-in [:tools @(:tab-id @conn)] (:to @conn)))
+                                :datalog-console.remote/db-detected (fn [conn _msg]
+                                                                      (set-icon-and-popup @(:tab-id @conn)))
+                                :* (fn [conn msg]
+                                     (let [env-context (if (gobj/getValueByKeys (:to @conn) "sender" "tab" "id") :tools :remote)
+                                           to (get-in @port-conns [env-context @(:tab-id @conn)])]
+                                       (.postMessage to (clj->js {(str ::msg/msg) (pr-str msg)}))))}
+                       :receive-fn (fn [cb _conn]
+                                     (when-let [tab-id (gobj/getValueByKeys port "sender" "tab" "id")]
+                                       (swap! port-conns assoc-in [:remote tab-id] port))
+                                     (let [listener (fn [message _port]
+                                                      (when-let [msg-tab-id (gobj/get message "tab-id")]
+                                                        (reset! tab-id msg-tab-id))
+                                                      (cb (cljs.reader/read-string (gobj/get message (str ::msg/msg)))))]
+                                       (.addListener (gobj/get port "onMessage") listener)
+                                       (.addListener (gobj/get port "onDisconnect")
+                                                     (fn [port]
+                                                       (when-let [msg (gobj/get port "onMessage")]
+                                                         (.removeListener msg listener))
+                                                       ;; conn-context may not work with other connection types: eg native application, cross-extension connections
+                                                       (let [conn-context (if (gobj/getValueByKeys port "sender" "tab" "id")
+                                                                            :remote
+                                                                            :tools)]
+                                                         (when-let [port-key (->> (conn-context @port-conns)
+                                                                                  (keep (fn [[k v]] (when (= v port) k)))
+                                                                                  (first))]
+                                                           (swap! port-conns update conn-context dissoc port-key)))))))}))))
 
-       ":datalog-console.remote/content-script-port"
-       (let [listener (partial handle-remote-message port)
-             tab-id   (gobj/getValueByKeys port "sender" "tab" "id")]
-
-         (swap! remote-conns* assoc tab-id port)
-
-         (.addListener (gobj/get port "onMessage") listener)
-         (.addListener (gobj/get port "onDisconnect")
-                       (fn [port]
-                         (remove-listener port listener)
-                         (swap! remote-conns* dissoc tab-id))))
-
-       ":datalog-console.client/devtool-port"
-       (let [listener (partial handle-devtool-message port)]
-         
-         (.addListener (gobj/get port "onMessage") listener)
-         (.addListener (gobj/get port "onDisconnect")
-                       (fn [port]
-                         (remove-listener port listener)
-                         (when-let [port-key (->> @tools-conns*
-                                                  (keep (fn [[k v]] (when (= v port) k)))
-                                                  (first))]
-                           (swap! tools-conns* dissoc port-key)))))
-
-
-       nil))))

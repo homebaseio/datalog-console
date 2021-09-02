@@ -31,3 +31,4 @@ pom.xml.asc
 shells/chrome/out
 public/js
 public/css/gen-styles.css
+resources

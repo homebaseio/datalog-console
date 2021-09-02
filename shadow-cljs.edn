@@ -1,4 +1,4 @@
-{:deps {:aliases [:dev]}
+{:deps {:aliases [:dev :test]}
  
  :http {:port 9610}
 
@@ -25,4 +25,9 @@
                            :compiler-options {:closure-output-charset "US-ASCII"
                                               :externs ["datascript/externs.js"]}
                            :devtools         {:devtools-url "http://localhost:9610"}
-                           :modules          {:main {:entries [datalog-console.chrome.extension.devtool.main]}}}}}
+                           :modules          {:main {:entries [datalog-console.chrome.extension.devtool.main]}}}
+          
+          :browser-test {:target :browser-test
+                         :test-dir "resources/public/js/test"
+                         :devtools {:http-port 8021 
+                                    :http-root "resources/public/js/test"}}}}

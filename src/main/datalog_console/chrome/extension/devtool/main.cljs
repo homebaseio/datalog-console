@@ -5,10 +5,6 @@
             [reagent.dom :as rdom]
             [datalog-console.client :as console]))
 
-
-(println ::loaded)
-
-
 (defn mount! []
   (rdom/render [console/root] (js/document.getElementById "root")))
 

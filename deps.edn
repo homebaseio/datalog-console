@@ -2,11 +2,13 @@
          "src/main"]
  :deps {datascript/datascript {:mvn/version "1.0.7"}
         binaryage/devtools {:mvn/version "1.0.2"}
+        org.clojure/core.async {:mvn/version "1.3.618"}
         org.clojure/data.xml {:mvn/version "0.0.8"}}
  
  :aliases {:dev {:extra-deps {nubank/workspaces {:mvn/version "1.0.16"}
                               thheller/shadow-cljs {:mvn/version "2.11.25"}
-                              reagent/reagent {:mvn/version "1.0.0"}}}
+                              reagent/reagent {:mvn/version "1.0.0"}}
+                 :extra-paths ["src/test"]}
            :jar {:replace-deps {com.github.seancorfield/depstar {:mvn/version "2.0.216"}}
                  :exec-fn hf.depstar/jar
                  :exec-args {:jar "datalog-console.jar" :sync-pom true}}

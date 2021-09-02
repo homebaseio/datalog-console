@@ -7,7 +7,7 @@
             [datalog-console.client :as client]
             [datalog-console.workspaces.workspace-db-conn :refer [conn]]))
 
-(reset! client/rconn conn)
+(reset! client/r-db-conn conn)
 
 (ws/defcard client-card
   {::wsm/align {:flex 1}
