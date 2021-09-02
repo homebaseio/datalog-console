@@ -1,6 +1,6 @@
 (ns datalog-console.lib.messaging
   (:require [clojure.core.async :as async :refer [>! <! go chan]]
-            [goog.object :as gobj]
+            [nano-id.core :refer [nano-id]]
             [cljs.reader]))
 
 
@@ -17,8 +17,7 @@
 
   (defn send [{:keys [conn type data]}]
     (let [ts (js/Date.now)
-          ;; TODO: use nano-id
-          id (rand)]
+          id (nano-id)]
       (enqueue conn {:id id
                      :type type
                      :data data
@@ -91,11 +90,11 @@
 
 (defn create-conn [{:keys [to from tab-id send-fn receive-fn base-retry-timeout base-received-timeout routes]}]
   (let [conn (atom {:msgs {}
-                    :id (rand)
+                    :id (nano-id)
                     :routes (or routes {})
                     :send-queue (chan 1000)
                     :base-retry-timeout (or base-retry-timeout 1000)
-                    :base-received-timeout (or base-received-timeout 0) ; This is a convenience for testing. Need to rethink.
+                    :base-received-timeout (or base-received-timeout 0)
                     :failed-list (take 20 (repeat nil))
                     :send-fn send-fn
                     :receive-fn receive-fn
