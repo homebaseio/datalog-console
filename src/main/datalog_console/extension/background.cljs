@@ -21,7 +21,7 @@
 (js/chrome.runtime.onConnect.addListener
  (fn [port]
    ;; The :tab-id for the create-conn is not always available upon connection to a port.
-   ;; It is obtained from sender tab id for :datalog-console.remote/content-script-port
+   ;; It is obtained from sender tab id for :datalog-console.extension.content-script/port
    ;; Otherwise it is within a message from :datalog-console.console/devtool-port
    ;; An atom is used here to assign a port to it's corresponding tab. 
    ;; The nil value from a :datalog-console.console/devtool-port port connection is replaced within the listener of the create-conn :receive-fn.
