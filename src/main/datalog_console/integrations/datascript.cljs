@@ -17,19 +17,19 @@
   (try
     (js/document.documentElement.setAttribute "__datalog-console-remote-installed__" true)
     (msg/create-conn {:to js/window
-                      :routes {:datalog-console.client/request-whole-database-as-string
+                      :routes {:datalog-console.console/request-whole-database-as-string
                                (fn [msg-conn _msg]
                                  (msg/send {:conn msg-conn
                                             :type :datalog-console.remote/db-as-string
                                             :data (pr-str @db-conn)}))
 
-                               :datalog-console.client/transact!
+                               :datalog-console.console/transact!
                                (fn [msg-conn msg] (let [transact-result (transact-from-devtool! db-conn (:data msg))]
                                                     (msg/send {:conn msg-conn
-                                                               :type :datalog-console.client.response/transact!
+                                                               :type :datalog-console.console.response/transact!
                                                                :data transact-result})))
 
-                               :datalog-console.client/request-integration-version
+                               :datalog-console.console/request-integration-version
                                (fn [msg-conn _msg]
                                  (msg/send {:conn msg-conn
                                             :type :datalog-console.remote/version

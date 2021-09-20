@@ -1,4 +1,4 @@
-(ns datalog-console.client
+(ns datalog-console.console
   {:no-doc true}
   (:require [reagent.dom :as rdom]
             [reagent.core :as r]
@@ -20,7 +20,7 @@
 (def integration-version (r/atom nil))
 
 (try
-  (def background-conn (msg/create-conn {:to (js/chrome.runtime.connect #js {:name ":datalog-console.client/devtool-port"})
+  (def background-conn (msg/create-conn {:to (js/chrome.runtime.connect #js {:name (str ::devtool-port)})
                                          :routes {:datalog-console.remote/version
                                                   (fn [msg-conn msg]
                                                     (reset! integration-version (:data msg)))
@@ -28,10 +28,10 @@
                                                   :datalog-console.remote/db-as-string
                                                   (fn [msg-conn msg] (reset! r-db-conn (d/conn-from-db (cljs.reader/read-string (:data msg)))))
 
-                                                  :datalog-console.client.response/transact!
+                                                  :datalog-console.console.response/transact!
                                                   (fn [msg-conn msg] (if (:success (:data msg))
                                                                        (msg/send {:conn msg-conn
-                                                                                  :type :datalog-console.client/request-whole-database-as-string})
+                                                                                  :type ::request-whole-database-as-string})
                                                                        (reset! r-error (:error (:data msg)))))}
                                          :tab-id js/chrome.devtools.inspectedWindow.tabId
                                          :send-fn (fn [{:keys [tab-id to msg]}]
@@ -46,9 +46,9 @@
 
 
   (msg/send {:conn background-conn
-             :type :datalog-console.client/init!})
+             :type ::init!})
   (msg/send {:conn background-conn
-             :type :datalog-console.client/request-integration-version})
+             :type ::request-integration-version})
 
   (catch js/Error _e nil))
 
@@ -57,7 +57,7 @@
         tabs ["Entity" "Query" "Transact"]
         on-tx-submit (fn [tx-str]
                        (msg/send {:conn background-conn
-                                  :type :datalog-console.client/transact!
+                                  :type ::transact!
                                   :data tx-str}))]
     @(r/track! #(do @entity-lookup-ratom
                     (reset! active-tab "Entity")))
@@ -99,7 +99,7 @@
          :on-click (fn []
                      (when-not @loaded-db? (reset! loaded-db? true))
                      (msg/send {:conn background-conn
-                                :type :datalog-console.client/request-whole-database-as-string}))}
+                                :type ::request-whole-database-as-string}))}
         (if @loaded-db? "Refresh database" "Load database")]])))
 
 (defn mount! []
@@ -112,3 +112,6 @@
   "Remounts the whole UI on every save. Def state you want to persist between remounts with defonce."
   []
   (mount!))
+
+
+

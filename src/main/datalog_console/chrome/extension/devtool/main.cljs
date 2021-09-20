@@ -3,7 +3,7 @@
   (:require [clojure.edn]
             [cljs.reader]
             [reagent.dom :as rdom]
-            [datalog-console.client :as console]))
+            [datalog-console.console :as console]))
 
 (defn mount! []
   (rdom/render [console/root] (js/document.getElementById "root")))
