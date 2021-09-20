@@ -1,13 +1,9 @@
-(ns datalog-console.chrome.extension.devtool.main
+(ns datalog-console.extension.devtool
   {:no-doc true}
   (:require [clojure.edn]
             [cljs.reader]
             [reagent.dom :as rdom]
-            [datalog-console.client :as console]))
-
-
-(println ::loaded)
-
+            [datalog-console.console :as console]))
 
 (defn mount! []
   (rdom/render [console/root] (js/document.getElementById "root")))

@@ -1,7 +1,7 @@
 {:manifest_version        2
  :name                    "Datalog Console"
  :version                 "0.3.2"
- :description             "Datalog DB administration panel for the chrome console"
+ :description             "Datalog DB administration panel for the browser console"
  :icons                   {"16"  "images/default/icon-16.png"
                            "32"  "images/default/icon-32.png"
                            "48"  "images/default/icon-48.png"
@@ -9,11 +9,11 @@
  :shadow/outputs           {:content-script
                             {:chrome/options {:matches ["<all_urls>"]
                                               :run_at  "document_idle"}
-                             :entries        [datalog-console.chrome.extension.content-script.main]}
+                             :entries        [datalog-console.extension.content-script]}
 
                             :background
                             {:chrome/options {:persistent false}
-                             :entries        [datalog-console.chrome.extension.background.main]}}
+                             :entries        [datalog-console.extension.background]}}
 
  :permissions             ["file:///*" "http://*/*" "https://*/*" "storage"]
  :externally-connectable  {:ids ["*"]}
