@@ -1,4 +1,4 @@
-(ns datalog-console.chrome.extension.content-script.main
+(ns datalog-console.extension.content-script
   {:no-doc true}
   (:require [goog.object :as gobj]
             [cljs.reader]
@@ -22,7 +22,7 @@
                                                            (cb (cljs.reader/read-string raw-msg)))))))}))
 
 (reset! background-conn
-        (msg/create-conn {:to (js/chrome.runtime.connect #js {:name ":datalog-console.remote/content-script-port"})
+        (msg/create-conn {:to (js/chrome.runtime.connect #js {:name (str ::port)})
                           :routes {:* (msg/forward app-tab-conn)}
                           :send-fn (fn [{:keys [to msg]}]
                                      (.postMessage to
@@ -39,7 +39,7 @@
 (defn detect-db! []
   (when (supports-datalog-console?)
     (msg/send {:conn @background-conn
-               :type :datalog-console.remote/db-detected
+               :type ::db-detected
                :data true})))
 
 (defn init-detector!

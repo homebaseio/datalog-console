@@ -1,4 +1,4 @@
-(ns datalog-console.chrome.extension.devtool.main
+(ns datalog-console.extension.devtool
   {:no-doc true}
   (:require [clojure.edn]
             [cljs.reader]

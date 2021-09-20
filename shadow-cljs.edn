@@ -25,7 +25,7 @@
                            :compiler-options {:closure-output-charset "US-ASCII"
                                               :externs ["datascript/externs.js"]}
                            :devtools         {:devtools-url "http://localhost:9610"}
-                           :modules          {:main {:entries [datalog-console.chrome.extension.devtool.main]}}}
+                           :modules          {:main {:entries [datalog-console.extension.devtool]}}}
           
           :browser-test {:target :browser-test
                          :test-dir "resources/public/js/test"

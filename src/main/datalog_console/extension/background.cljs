@@ -1,4 +1,4 @@
-(ns datalog-console.chrome.extension.background.main
+(ns datalog-console.extension.background
   {:no-doc true}
   (:require [goog.object :as gobj]
             [cljs.reader]
@@ -32,7 +32,7 @@
                        :tab-id tab-id
                        :routes {:datalog-console.console/init! (fn [conn _msg]
                                                                 (swap! port-conns assoc-in [:consoles @(:tab-id @conn)] (:to @conn)))
-                                :datalog-console.remote/db-detected (fn [conn _msg]
+                                :datalog-console.extension.content-script/db-detected (fn [conn _msg]
                                                                       (set-icon-and-popup @(:tab-id @conn)))
                                 :* (fn [conn msg]
                                      (let [env-context (if (gobj/getValueByKeys (:to @conn) "sender" "tab" "id") :consoles :remotes)
