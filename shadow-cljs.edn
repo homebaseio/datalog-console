@@ -16,11 +16,11 @@
           :chrome {:target :chrome-extension
                    :compiler-options {:closure-output-charset "US-ASCII"
                                       :externs ["datascript/externs.js"]}
-                   :extension-dir "shells/chrome"
+                   :extension-dir "shells/extension"
                    :devtools {:devtools-url "http://localhost:9610"}}
 
           :chrome-devtool {:target           :browser
-                           :output-dir       "shells/chrome/js/devtool"
+                           :output-dir       "shells/extension/js/devtool"
                            :asset-path       "js/devtool"
                            :compiler-options {:closure-output-charset "US-ASCII"
                                               :externs ["datascript/externs.js"]}

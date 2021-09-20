@@ -12,14 +12,14 @@
     "dev-chrome": "shadow-cljs watch chrome-devtool chrome --config-merge '{:compiler-options {:source-map-inline true}}' workspaces",
     "repl-background": "shadow-cljs cljs-repl chrome",
     "repl-panel": "shadow-cljs cljs-repl chrome-devtool",
-    "build:tailwind:dev": "postcss public/css/styles.css -o public/css/gen-styles.css; postcss public/css/styles.css -o shells/chrome/css/gen-styles.css",
+    "build:tailwind:dev": "postcss public/css/styles.css -o public/css/gen-styles.css; postcss public/css/styles.css -o shells/extension/css/gen-styles.css",
     "build:tailwind:dev:watch": "postcss public/css/styles.css -o public/css/gen-styles.css -w",
-    "build:tailwind": "NODE_ENV=production postcss public/css/styles.css -o public/css/gen-styles.css; NODE_ENV=production postcss public/css/styles.css -o shells/chrome/css/gen-styles.css",
+    "build:tailwind": "NODE_ENV=production postcss public/css/styles.css -o public/css/gen-styles.css; NODE_ENV=production postcss public/css/styles.css -o shells/extension/css/gen-styles.css",
     "dev-workspaces": "shadow-cljs watch workspaces",
     "build:workspaces": "shadow-cljs release workspaces",
-    "build:chrome": "rm shells/chrome/manifest.json ; rm -rf shells/chrome/out ; rm -rf shells/chrome/js ; shadow-cljs release chrome chrome-devtool",
+    "build:chrome": "rm shells/extension/manifest.json ; rm -rf shells/extension/out ; rm -rf shells/extension/js ; shadow-cljs release chrome chrome-devtool",
     "build": "yarn build:tailwind ; yarn build:workspaces ; yarn build:chrome",
-    "build:clean": "rm -rf .shadow-cljs; rm -rf node_modules; rm -rf .cpcache; rm -rf .calva; rm -rf shells/chrome/js; rm -rf shells/chrome/out; rm -rf public/js"
+    "build:clean": "rm -rf .shadow-cljs; rm -rf node_modules; rm -rf .cpcache; rm -rf .calva; rm -rf shells/extension/js; rm -rf shells/extension/out; rm -rf public/js"
   },
   "devDependencies": {
     "autoprefixer": "^10.2.5",
