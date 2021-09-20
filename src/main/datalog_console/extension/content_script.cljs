@@ -48,7 +48,6 @@
   (detect-db!)
   (js/setTimeout detect-db! 1000)
   (js/setTimeout detect-db! 3000)
-  (js/setTimeout detect-db! 10000)
-  )
+  (js/setTimeout detect-db! 10000))
 
 (init-detector!)
