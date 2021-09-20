@@ -20,7 +20,12 @@
 
 (js/chrome.runtime.onConnect.addListener
  (fn [port]
-   (let [tab-id (atom (gobj/getValueByKeys port "sender" "tab" "id"))]
+   ;; The :tab-id for the create-conn is not always available upon connection to a port.
+   ;; It is obtained from sender tab id for :datalog-console.remote/content-script-port
+   ;; Otherwise it is within a message from :datalog-console.client/devtool-port
+   ;; An atom is used here to assign a port to it's corresponding tab. 
+   ;; The nil value from a :datalog-console.client/devtool-port port connection is replaced within the listener of the create-conn :receive-fn.
+   (let [tab-id (atom (gobj/getValueByKeys port "sender" "tab" "id"))] 
      (msg/create-conn {:to port
                        :send-fn (fn [{:keys [to msg]}]
                                   (.postMessage to (clj->js {(str ::msg/msg) (pr-str msg)})))

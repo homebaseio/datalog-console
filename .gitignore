@@ -28,6 +28,7 @@ pom.xml.asc
 .history
 .calva
 .cpcache
+.clj-kondo
 shells/chrome/out
 public/js
 public/css/gen-styles.css
