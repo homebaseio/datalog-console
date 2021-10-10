@@ -5,6 +5,7 @@ Administration UI for Datascript, Datahike, and other Datalog databases
 ## Integrations
 
 - [datascript](https://github.com/tonsky/datascript)
+- [datahike](https://github.com/replikativ/datahike)
 
 ## Installation and Usage
 
